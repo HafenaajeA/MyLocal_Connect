@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Home, User, PlusCircle, LogOut, Menu, X } from 'lucide-react';
+import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -40,6 +40,10 @@ const Navbar = () => {
                 <Link to="/create-post" className="nav-link">
                   <PlusCircle size={20} />
                   Create Post
+                </Link>
+                <Link to="/chat" className="nav-link">
+                  <MessageCircle size={20} />
+                  Messages
                 </Link>
                 <Link to="/profile" className="nav-link">
                   <User size={20} />
@@ -103,6 +107,14 @@ const Navbar = () => {
                 >
                   <PlusCircle size={20} />
                   Create Post
+                </Link>
+                <Link 
+                  to="/chat" 
+                  className="mobile-nav-link"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <MessageCircle size={20} />
+                  Messages
                 </Link>
                 <Link 
                   to="/profile" 
