@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import morgan from 'morgan';
+import { createServer } from 'http';
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -13,6 +14,10 @@ import postRoutes from './routes/posts.js';
 import vendorRoutes from './routes/vendors.js';
 import businessRoutes from './routes/businesses.js';
 import reviewRoutes from './routes/reviews.js';
+import chatRoutes from './routes/chats.js';
+
+// Import Socket.IO service
+import socketService from './services/socketService.js';
 
 // Load environment variables
 dotenv.config();
@@ -51,6 +56,7 @@ app.use('/api/posts', postRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/chats', chatRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
@@ -91,12 +97,19 @@ const startServer = async () => {
   try {
     await connectDB();
     
+    // Create HTTP server
+    const server = createServer(app);
+    
+    // Initialize Socket.IO
+    socketService.initialize(server);
+    
     // Handle port conflicts gracefully
-    const server = app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log(`✅ Server is running on port ${PORT}`);
       console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
       console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
       console.log(`📚 API Documentation: Check BUSINESS_API.md for endpoints`);
+      console.log(`📡 Socket.IO enabled for real-time chat`);
     });
 
     // Handle server errors

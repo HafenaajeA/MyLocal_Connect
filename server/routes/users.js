@@ -217,10 +217,11 @@ router.get('/search', async (req, res) => {
       $or: [
         { username: { $regex: q, $options: 'i' } },
         { firstName: { $regex: q, $options: 'i' } },
-        { lastName: { $regex: q, $options: 'i' } }
+        { lastName: { $regex: q, $options: 'i' } },
+        { businessName: { $regex: q, $options: 'i' } }
       ]
     })
-    .select('username firstName lastName avatar bio location')
+    .select('username firstName lastName avatar bio location role businessName businessDescription businessAddress businessPhone businessCategories isVerifiedVendor vendorRating')
     .limit(parseInt(limit));
 
     res.json({

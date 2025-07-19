@@ -3,6 +3,8 @@ import User from '../models/User.js';
 import Post from '../models/Post.js';
 import Business from '../models/Business.js';
 import Review from '../models/Review.js';
+import Chat from '../models/Chat.js';
+import Message from '../models/Message.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -16,6 +18,8 @@ const seedData = async () => {
     await Post.deleteMany({});
     await Business.deleteMany({});
     await Review.deleteMany({});
+    await Chat.deleteMany({});
+    await Message.deleteMany({});
     
     console.log('Existing data cleared');
 
@@ -506,7 +510,201 @@ const seedData = async () => {
     const createdReviews = await Review.create(reviews);
     console.log('Sample reviews created');
 
-    // Add some likes and comments
+    // Create sample chats between customers and vendors
+    const chats = [
+      {
+        participants: [
+          {
+            user: createdUsers[1]._id, // John Doe (customer)
+            role: 'customer',
+            lastRead: new Date()
+          },
+          {
+            user: createdUsers[3]._id, // Mike Johnson (vendor - Pizza Palace)
+            role: 'vendor',
+            lastRead: new Date()
+          }
+        ],
+        business: createdBusinesses[0]._id, // Pizza Palace
+        metadata: {
+          customerInfo: {
+            name: 'John Doe',
+            avatar: ''
+          },
+          vendorInfo: {
+            businessName: 'Pizza Palace',
+            avatar: ''
+          }
+        }
+      },
+      {
+        participants: [
+          {
+            user: createdUsers[2]._id, // Jane Smith (customer)
+            role: 'customer',
+            lastRead: new Date()
+          },
+          {
+            user: createdUsers[4]._id, // Sarah Davis (vendor - TechRepair Pro)
+            role: 'vendor',
+            lastRead: new Date()
+          }
+        ],
+        business: createdBusinesses[1]._id, // TechRepair Pro
+        metadata: {
+          customerInfo: {
+            name: 'Jane Smith',
+            avatar: ''
+          },
+          vendorInfo: {
+            businessName: 'TechRepair Pro',
+            avatar: ''
+          }
+        }
+      },
+      {
+        participants: [
+          {
+            user: createdUsers[1]._id, // John Doe (customer)
+            role: 'customer',
+            lastRead: new Date()
+          },
+          {
+            user: createdUsers[5]._id, // Emily Wilson (vendor - Bella Beauty Salon)
+            role: 'vendor',
+            lastRead: new Date()
+          }
+        ],
+        business: createdBusinesses[2]._id, // Bella Beauty Salon
+        metadata: {
+          customerInfo: {
+            name: 'John Doe',
+            avatar: ''
+          },
+          vendorInfo: {
+            businessName: 'Bella Beauty Salon',
+            avatar: ''
+          }
+        }
+      }
+    ];
+
+    const createdChats = await Chat.create(chats);
+    console.log('Sample chats created');
+
+    // Create sample messages for the chats
+    const messages = [
+      // Messages for Pizza Palace chat
+      {
+        chat: createdChats[0]._id,
+        sender: createdUsers[1]._id, // John Doe
+        senderRole: 'customer',
+        content: 'Hi! I\'d like to know more about your pizza specials for this week.',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[0]._id,
+        sender: createdUsers[3]._id, // Mike Johnson (Pizza Palace vendor)
+        senderRole: 'vendor',
+        content: 'Hello! Thanks for your interest. This week we have a great deal on our Supreme Pizza - buy one large, get the second one 50% off!',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[0]._id,
+        sender: createdUsers[1]._id, // John Doe
+        senderRole: 'customer',
+        content: 'That sounds great! What ingredients are on the Supreme Pizza?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[0]._id,
+        sender: createdUsers[3]._id, // Mike Johnson
+        senderRole: 'vendor',
+        content: 'The Supreme comes with pepperoni, Italian sausage, bell peppers, onions, mushrooms, and black olives. It\'s definitely our most popular!',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[0]._id,
+        sender: createdUsers[1]._id, // John Doe
+        senderRole: 'customer',
+        content: 'Perfect! I\'ll place an order for two large Supreme pizzas. What\'s your estimated delivery time?',
+        messageType: 'text'
+      },
+
+      // Messages for TechRepair Pro chat
+      {
+        chat: createdChats[1]._id,
+        sender: createdUsers[2]._id, // Jane Smith
+        senderRole: 'customer',
+        content: 'Hi, my laptop screen is cracked and I need it repaired urgently. Do you provide same-day service?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[1]._id,
+        sender: createdUsers[4]._id, // Sarah Davis (TechRepair Pro vendor)
+        senderRole: 'vendor',
+        content: 'Hello Jane! Yes, we do offer same-day screen replacement for most laptop models. Could you tell me the make and model of your laptop?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[1]._id,
+        sender: createdUsers[2]._id, // Jane Smith
+        senderRole: 'customer',
+        content: 'It\'s a MacBook Pro 13-inch from 2021. The crack is pretty bad - goes across half the screen.',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[1]._id,
+        sender: createdUsers[4]._id, // Sarah Davis
+        senderRole: 'vendor',
+        content: 'I have that screen in stock! The repair would be $299 and I can have it ready by 5 PM today if you bring it in before noon. Would that work for you?',
+        messageType: 'text'
+      },
+
+      // Messages for Bella Beauty Salon chat
+      {
+        chat: createdChats[2]._id,
+        sender: createdUsers[1]._id, // John Doe
+        senderRole: 'customer',
+        content: 'Hello! I\'d like to book a haircut appointment for this Saturday. Do you have any availability?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[2]._id,
+        sender: createdUsers[5]._id, // Emily Wilson (Bella Beauty Salon vendor)
+        senderRole: 'vendor',
+        content: 'Hi John! Yes, I have availability on Saturday. I have slots at 10 AM, 2 PM, and 4 PM. Which time works best for you?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[2]._id,
+        sender: createdUsers[1]._id, // John Doe
+        senderRole: 'customer',
+        content: 'The 2 PM slot would be perfect! How much do you charge for a men\'s haircut?',
+        messageType: 'text'
+      },
+      {
+        chat: createdChats[2]._id,
+        sender: createdUsers[5]._id, // Emily Wilson
+        senderRole: 'vendor',
+        content: 'Great! I\'ll book you for 2 PM on Saturday. Men\'s haircuts are $35. Please let me know if you need to reschedule at least 2 hours in advance.',
+        messageType: 'text'
+      }
+    ];
+
+    const createdMessages = await Message.create(messages);
+    console.log('Sample messages created');
+
+    // Update chats with last messages and activity
+    for (let i = 0; i < createdChats.length; i++) {
+      const chatMessages = createdMessages.filter(msg => msg.chat.toString() === createdChats[i]._id.toString());
+      if (chatMessages.length > 0) {
+        const lastMessage = chatMessages[chatMessages.length - 1];
+        await createdChats[i].updateLastMessage(lastMessage._id);
+      }
+    }
+
+    // Add some likes and comments to posts
     await createdPosts[0].addLike(createdUsers[1]._id);
     await createdPosts[0].addLike(createdUsers[2]._id);
     await createdPosts[0].addComment(createdUsers[1]._id, 'Great initiative! Looking forward to connecting with neighbors.');
