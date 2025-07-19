@@ -8,6 +8,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Review System**: Complete review and rating system for businesses
+  - Users can leave one review per business with rating (1-5 stars, 0.5 increments)
+  - Duplicate review prevention with compound unique index
+  - Review model with rating, comment, title, and user/business references
+  - Review interactions: mark as helpful, report inappropriate reviews
+  - Business statistics calculation (average rating, total reviews, rating distribution)
+  - Admin moderation capabilities (hide/unhide reviews with moderator notes)
+- **Review API Endpoints**: Comprehensive REST API for review operations
+  - GET reviews for business with pagination, filtering, and sorting
+  - GET reviews by user with pagination
+  - POST create review with authentication and duplicate prevention
+  - PUT update review (author only)
+  - DELETE review (author or admin)
+  - POST mark review as helpful
+  - POST report review with reason categories
+  - GET check if user can review business
+  - GET business review statistics
+  - Admin endpoints for review moderation
+- **Review Features**: Advanced review system capabilities
+  - Half-star rating support (1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5)
+  - Comment validation (10-1000 characters)
+  - Optional review titles (max 100 characters)
+  - Helpful votes tracking
+  - Review reporting system with categories (inappropriate, spam, fake, offensive, other)
+  - Business rating aggregation and distribution analytics
+- **Middleware Enhancement**: Added role-based access control middleware
+  - Role middleware with support for multiple roles
+  - Specific middleware for admin, vendor, customer roles
+  - Enhanced authentication middleware integration
 
 ### Changed
 
@@ -19,6 +48,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Port Conflict Resolution**: Fixed EADDRINUSE error on port 5000 by implementing better port conflict detection and resolution
 - **Environment Setup**: Created .env file from .env.example template for proper server configuration
 - **Server Management**: Enhanced server startup process to handle port conflicts gracefully and suggest alternative ports
+- **Authentication Integration**: Fixed middleware imports and user object structure for review system
+
+### Security
+- **Review Security**: Implemented comprehensive security measures for review system
+  - Duplicate review prevention at database level
+  - User ownership validation for review updates/deletions
+  - Admin-only access for review moderation features
+  - Input validation and sanitization for all review data
+
+## [1.4.0] - 2025-07-19
+
+### Added
+- **Complete Review System**: Implemented comprehensive business review and rating functionality
+  - One review per user per business with duplicate prevention
+  - Star ratings with half-star increments (1-5 scale)
+  - Review comments (10-1000 characters) and optional titles
+  - Review interactions: helpful votes, reporting system
+  - Business statistics: average rating, total reviews, rating distribution
+- **Review API**: Full REST API for review management
+  - 15+ endpoints covering all review operations
+  - Advanced querying: pagination, filtering by rating, sorting options
+  - User permission checks and business statistics
+  - Admin moderation capabilities
+- **Database Enhancements**: Review model with comprehensive schema
+  - Compound unique indexes for performance and duplicate prevention
+  - Aggregation pipelines for real-time business statistics
+  - Soft deletion support for moderation
+- **Testing & Documentation**: Complete testing suite and documentation
+  - Comprehensive test script with 15+ test cases
+  - Detailed API documentation with examples
+  - Error handling and edge case coverage
+
+### Technical Details
+- **Models**: Review.js with advanced schema validation and static methods
+- **Routes**: reviews.js with full CRUD operations and specialized endpoints
+- **Middleware**: Enhanced roleMiddleware.js for granular access control
+- **Seeding**: Updated seed script with sample reviews for all businesses
+- **Documentation**: REVIEW_API.md with complete endpoint documentation
+
+### Enhanced Features
+- **Duplicate Prevention**: Database-level constraints and middleware validation
+- **Business Analytics**: Real-time rating calculations and distribution tracking
+- **Moderation Tools**: Admin capabilities for content management
+- **Performance**: Optimized queries with proper indexing
+- **Security**: Role-based access control and input validation
 
 ### Security
 
