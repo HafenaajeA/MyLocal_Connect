@@ -84,13 +84,55 @@ const connectDB = async () => {
   }
 };
 
-// Start server
+// Start server with better error handling
 const startServer = async () => {
-  await connectDB();
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-  });
+  try {
+    await connectDB();
+    
+    // Handle port conflicts gracefully
+    const server = app.listen(PORT, () => {
+      console.log(`✅ Server is running on port ${PORT}`);
+      console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+      console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
+      console.log(`📚 API Documentation: Check BUSINESS_API.md for endpoints`);
+    });
+
+    // Handle server errors
+    server.on('error', (error) => {
+      if (error.code === 'EADDRINUSE') {
+        console.error(`❌ Port ${PORT} is already in use!`);
+        console.log(`\n🔧 Solutions:`);
+        console.log(`   1. Kill existing process: pkill -f "node server.js"`);
+        console.log(`   2. Use different port: PORT=5001 pnpm run dev`);
+        console.log(`   3. Check running processes: lsof -i :${PORT}`);
+        process.exit(1);
+      } else {
+        console.error('❌ Server error:', error);
+        process.exit(1);
+      }
+    });
+
+    // Graceful shutdown
+    process.on('SIGTERM', () => {
+      console.log('\n🛑 SIGTERM received, shutting down gracefully...');
+      server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+      });
+    });
+
+    process.on('SIGINT', () => {
+      console.log('\n🛑 SIGINT received, shutting down gracefully...');
+      server.close(() => {
+        console.log('✅ Server closed');
+        process.exit(0);
+      });
+    });
+
+  } catch (error) {
+    console.error('❌ Failed to start server:', error);
+    process.exit(1);
+  }
 };
 
 startServer();
