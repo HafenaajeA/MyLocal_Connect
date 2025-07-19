@@ -11,6 +11,7 @@ import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import postRoutes from './routes/posts.js';
 import vendorRoutes from './routes/vendors.js';
+import businessRoutes from './routes/businesses.js';
 
 // Load environment variables
 dotenv.config();
@@ -47,6 +48,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/vendors', vendorRoutes);
+app.use('/api/businesses', businessRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

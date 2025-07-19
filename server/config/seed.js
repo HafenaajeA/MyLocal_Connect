@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
+import Business from '../models/Business.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -12,6 +13,8 @@ const seedData = async () => {
     // Clear existing data
     await User.deleteMany({});
     await Post.deleteMany({});
+    await Business.deleteMany({});
+    await Business.deleteMany({});
     
     console.log('Existing data cleared');
 
@@ -198,6 +201,253 @@ const seedData = async () => {
 
     const createdPosts = await Post.create(posts);
     console.log('Sample posts created');
+
+    // Create sample businesses
+    const businesses = [
+      {
+        name: 'Pizza Palace',
+        category: 'restaurant',
+        subcategory: 'Italian',
+        description: 'Authentic Italian pizza made with fresh ingredients and traditional recipes passed down through generations. We use only the finest San Marzano tomatoes, fresh mozzarella, and imported Italian meats.',
+        location: {
+          address: {
+            street: '123 Main Street',
+            city: 'San Francisco',
+            state: 'CA',
+            zipCode: '94102',
+            country: 'United States'
+          },
+          coordinates: {
+            type: 'Point',
+            coordinates: [-122.4194, 37.7749] // [longitude, latitude]
+          }
+        },
+        contactInfo: {
+          phone: '+1-555-0123',
+          email: 'contact@pizzapalace.com',
+          website: 'https://pizzapalace.com',
+          socialMedia: {
+            facebook: 'https://facebook.com/pizzapalace',
+            instagram: 'https://instagram.com/pizzapalace'
+          }
+        },
+        imageUrl: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b',
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b',
+            caption: 'Our signature Margherita pizza',
+            isPrimary: true
+          },
+          {
+            url: 'https://images.unsplash.com/photo-1571997478779-2adcbbe9ab2f',
+            caption: 'Cozy restaurant interior'
+          }
+        ],
+        businessHours: {
+          monday: { open: '11:00', close: '22:00', closed: false },
+          tuesday: { open: '11:00', close: '22:00', closed: false },
+          wednesday: { open: '11:00', close: '22:00', closed: false },
+          thursday: { open: '11:00', close: '22:00', closed: false },
+          friday: { open: '11:00', close: '23:00', closed: false },
+          saturday: { open: '11:00', close: '23:00', closed: false },
+          sunday: { open: '12:00', close: '21:00', closed: false }
+        },
+        vendor: createdUsers[3]._id, // Pizza Palace vendor
+        isActive: true,
+        isVerified: true,
+        isFeatured: true,
+        rating: {
+          average: 4.5,
+          totalReviews: 127
+        },
+        priceRange: '$$',
+        tags: ['italian', 'pizza', 'authentic', 'family-friendly'],
+        amenities: ['takeout', 'delivery', 'dine-in', 'parking'],
+        services: [
+          {
+            name: 'Dine-in Service',
+            description: 'Full restaurant service with table seating',
+            price: 0,
+            duration: '1-2 hours'
+          },
+          {
+            name: 'Takeout',
+            description: 'Order ahead for quick pickup',
+            price: 0,
+            duration: '15-20 minutes'
+          },
+          {
+            name: 'Delivery',
+            description: 'Hot pizza delivered to your door',
+            price: 3.99,
+            duration: '30-45 minutes'
+          }
+        ],
+        views: 1250
+      },
+      {
+        name: 'TechRepair Pro',
+        category: 'technology',
+        subcategory: 'Repair Services',
+        description: 'Professional computer and mobile device repair services with over 10 years of experience. We specialize in hardware repairs, software troubleshooting, and data recovery for all major brands.',
+        location: {
+          address: {
+            street: '456 Tech Avenue',
+            city: 'Los Angeles',
+            state: 'CA',
+            zipCode: '90210',
+            country: 'United States'
+          },
+          coordinates: {
+            type: 'Point',
+            coordinates: [-118.2437, 34.0522] // [longitude, latitude]
+          }
+        },
+        contactInfo: {
+          phone: '+1-555-0456',
+          email: 'contact@techrepairpro.com',
+          website: 'https://techrepairpro.com',
+          socialMedia: {
+            linkedin: 'https://linkedin.com/company/techrepairpro'
+          }
+        },
+        imageUrl: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13',
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1558618047-3c8c76ca7d13',
+            caption: 'Professional repair workspace',
+            isPrimary: true
+          }
+        ],
+        businessHours: {
+          monday: { open: '09:00', close: '18:00', closed: false },
+          tuesday: { open: '09:00', close: '18:00', closed: false },
+          wednesday: { open: '09:00', close: '18:00', closed: false },
+          thursday: { open: '09:00', close: '18:00', closed: false },
+          friday: { open: '09:00', close: '18:00', closed: false },
+          saturday: { open: '10:00', close: '16:00', closed: false },
+          sunday: { open: '', close: '', closed: true }
+        },
+        vendor: createdUsers[4]._id, // TechRepair vendor
+        isActive: true,
+        isVerified: true,
+        isFeatured: false,
+        rating: {
+          average: 4.8,
+          totalReviews: 89
+        },
+        priceRange: '$$',
+        tags: ['computer repair', 'mobile repair', 'data recovery', 'professional'],
+        amenities: ['free diagnostics', 'warranty', 'pickup service'],
+        services: [
+          {
+            name: 'Computer Repair',
+            description: 'Hardware and software repair for laptops and desktops',
+            price: 75,
+            duration: '1-3 days'
+          },
+          {
+            name: 'Mobile Device Repair',
+            description: 'Screen replacement and hardware repair for smartphones and tablets',
+            price: 50,
+            duration: '1-2 hours'
+          },
+          {
+            name: 'Data Recovery',
+            description: 'Recover lost data from damaged storage devices',
+            price: 150,
+            duration: '3-7 days'
+          }
+        ],
+        views: 892
+      },
+      {
+        name: 'Bella Beauty Salon',
+        category: 'beauty',
+        subcategory: 'Full Service Salon',
+        description: 'Full-service beauty salon offering professional haircuts, styling, coloring, manicures, pedicures, and facial treatments. Our licensed cosmetologists provide personalized beauty services in a relaxing environment.',
+        location: {
+          address: {
+            street: '789 Beauty Boulevard',
+            city: 'New York',
+            state: 'NY',
+            zipCode: '10001',
+            country: 'United States'
+          },
+          coordinates: {
+            type: 'Point',
+            coordinates: [-74.0060, 40.7128] // [longitude, latitude]
+          }
+        },
+        contactInfo: {
+          phone: '+1-555-0789',
+          email: 'info@bellasalon.com',
+          website: 'https://bellasalon.com',
+          socialMedia: {
+            instagram: 'https://instagram.com/bellasalon',
+            facebook: 'https://facebook.com/bellasalon'
+          }
+        },
+        imageUrl: 'https://images.unsplash.com/photo-1562322140-8baeececf3df',
+        images: [
+          {
+            url: 'https://images.unsplash.com/photo-1562322140-8baeececf3df',
+            caption: 'Modern salon interior',
+            isPrimary: true
+          }
+        ],
+        businessHours: {
+          monday: { open: '', close: '', closed: true },
+          tuesday: { open: '09:00', close: '19:00', closed: false },
+          wednesday: { open: '09:00', close: '19:00', closed: false },
+          thursday: { open: '09:00', close: '19:00', closed: false },
+          friday: { open: '09:00', close: '19:00', closed: false },
+          saturday: { open: '08:00', close: '18:00', closed: false },
+          sunday: { open: '10:00', close: '16:00', closed: false }
+        },
+        vendor: createdUsers[5]._id, // Beauty salon vendor
+        isActive: true,
+        isVerified: false, // Pending verification
+        isFeatured: false,
+        rating: {
+          average: 0,
+          totalReviews: 0
+        },
+        priceRange: '$$$',
+        tags: ['haircut', 'styling', 'manicure', 'pedicure', 'facial'],
+        amenities: ['appointment booking', 'consultation', 'parking'],
+        services: [
+          {
+            name: 'Haircut & Style',
+            description: 'Professional haircut with styling',
+            price: 85,
+            duration: '1 hour'
+          },
+          {
+            name: 'Hair Coloring',
+            description: 'Full color or highlights with professional products',
+            price: 150,
+            duration: '2-3 hours'
+          },
+          {
+            name: 'Manicure',
+            description: 'Complete nail care and polish',
+            price: 35,
+            duration: '45 minutes'
+          },
+          {
+            name: 'Pedicure',
+            description: 'Complete foot care and polish',
+            price: 45,
+            duration: '1 hour'
+          }
+        ],
+        views: 234
+      }
+    ];
+
+    const createdBusinesses = await Business.create(businesses);
+    console.log('Sample businesses created');
 
     // Add some likes and comments
     await createdPosts[0].addLike(createdUsers[1]._id);
