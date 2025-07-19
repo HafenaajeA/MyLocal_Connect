@@ -1,0 +1,30 @@
+{
+  "name": "mylocal-connect",
+  "version": "1.0.0",
+  "description": "A full-stack MERN application for community connection",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"pnpm run server:dev\" \"pnpm run client:dev\"",
+    "start": "pnpm run server:start",
+    "server:dev": "cd server && pnpm run dev",
+    "server:start": "cd server && pnpm start",
+    "client:dev": "cd client && pnpm run dev",
+    "client:build": "cd client && pnpm run build",
+    "install:all": "pnpm install && cd server && pnpm install && cd ../client && pnpm install",
+    "seed": "cd server && pnpm run seed"
+  },
+  "keywords": [
+    "mern",
+    "react",
+    "nodejs",
+    "express",
+    "mongodb",
+    "community",
+    "local-connect"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
