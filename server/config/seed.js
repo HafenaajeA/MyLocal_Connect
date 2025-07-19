@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import User from '../models/User.js';
 import Post from '../models/Post.js';
 import Business from '../models/Business.js';
+import Review from '../models/Review.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -14,7 +15,7 @@ const seedData = async () => {
     await User.deleteMany({});
     await Post.deleteMany({});
     await Business.deleteMany({});
-    await Business.deleteMany({});
+    await Review.deleteMany({});
     
     console.log('Existing data cleared');
 
@@ -448,6 +449,62 @@ const seedData = async () => {
 
     const createdBusinesses = await Business.create(businesses);
     console.log('Sample businesses created');
+
+    // Create sample reviews
+    const reviews = [
+      {
+        user: createdUsers[1]._id, // John Doe
+        business: createdBusinesses[0]._id, // Pizza Palace
+        rating: 5,
+        title: 'Excellent Pizza!',
+        comment: 'This place has the best pizza in town! The ingredients are fresh and the atmosphere is perfect for dining with family. Highly recommend the Margherita pizza.'
+      },
+      {
+        user: createdUsers[2]._id, // Jane Smith
+        business: createdBusinesses[0]._id, // Pizza Palace
+        rating: 4.5,
+        title: 'Great local spot',
+        comment: 'Love this pizza place! Great selection and the food is fresh. Sometimes gets a bit crowded during peak hours but definitely worth the wait.'
+      },
+      {
+        user: createdUsers[1]._id, // John Doe
+        business: createdBusinesses[1]._id, // TechRepair Pro
+        rating: 4,
+        title: 'Solid tech support',
+        comment: 'Good tech repair service with fair pricing. The staff explained the problem clearly and fixed my phone screen quickly. Professional service.'
+      },
+      {
+        user: createdUsers[2]._id, // Jane Smith
+        business: createdBusinesses[1]._id, // TechRepair Pro
+        rating: 5,
+        title: 'Saved my computer!',
+        comment: 'My laptop was completely dead and I thought I lost everything. The team at TechRepair not only fixed it but recovered all my important files. Professional, fast, and reasonably priced!'
+      },
+      {
+        user: createdUsers[0]._id, // Admin
+        business: createdBusinesses[1]._id, // TechRepair Pro
+        rating: 4,
+        title: 'Reliable tech support',
+        comment: 'Good service and knowledgeable technicians. They explained the problem clearly and fixed my phone screen quickly. Prices are fair for the quality of work.'
+      },
+      {
+        user: createdUsers[0]._id, // Admin
+        business: createdBusinesses[2]._id, // Bella Beauty Salon
+        rating: 5,
+        title: 'Relaxing and professional',
+        comment: 'What a wonderful spa experience! The massage was incredibly relaxing and the facial left my skin glowing. The staff is professional and the atmosphere is so peaceful.'
+      },
+      {
+        user: createdUsers[1]._id, // John Doe
+        business: createdBusinesses[2]._id, // Bella Beauty Salon
+        rating: 4.5,
+        title: 'Great haircut and service',
+        comment: 'Got an excellent haircut here. The stylist listened to what I wanted and delivered exactly that. The salon is clean, modern, and the staff is friendly and professional.'
+      }
+    ];
+
+    const createdReviews = await Review.create(reviews);
+    console.log('Sample reviews created');
 
     // Add some likes and comments
     await createdPosts[0].addLike(createdUsers[1]._id);
