@@ -48,14 +48,78 @@ const userSchema = new mongoose.Schema({
     maxlength: [100, 'Location cannot exceed 100 characters'],
     default: ''
   },
+  // Vendor-specific fields
+  businessName: {
+    type: String,
+    maxlength: [100, 'Business name cannot exceed 100 characters'],
+    default: ''
+  },
+  businessDescription: {
+    type: String,
+    maxlength: [1000, 'Business description cannot exceed 1000 characters'],
+    default: ''
+  },
+  businessAddress: {
+    street: {
+      type: String,
+      default: ''
+    },
+    city: {
+      type: String,
+      default: ''
+    },
+    state: {
+      type: String,
+      default: ''
+    },
+    zipCode: {
+      type: String,
+      default: ''
+    }
+  },
+  businessPhone: {
+    type: String,
+    default: ''
+  },
+  businessWebsite: {
+    type: String,
+    default: ''
+  },
+  businessCategories: [{
+    type: String,
+    enum: ['restaurant', 'retail', 'services', 'healthcare', 'automotive', 'beauty', 'fitness', 'education', 'technology', 'other']
+  }],
+  businessHours: {
+    monday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    tuesday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    wednesday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    thursday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    friday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    saturday: { open: String, close: String, closed: { type: Boolean, default: false } },
+    sunday: { open: String, close: String, closed: { type: Boolean, default: false } }
+  },
+  isVerifiedVendor: {
+    type: Boolean,
+    default: false
+  },
+  vendorRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  totalReviews: {
+    type: Number,
+    default: 0
+  },
   isVerified: {
     type: Boolean,
     default: false
   },
   role: {
     type: String,
-    enum: ['user', 'admin'],
-    default: 'user'
+    enum: ['customer', 'vendor', 'admin'],
+    default: 'customer'
   },
   followers: [{
     type: mongoose.Schema.Types.ObjectId,

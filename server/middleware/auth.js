@@ -48,3 +48,41 @@ export const adminMiddleware = (req, res, next) => {
     });
   }
 };
+
+// Vendor access middleware
+export const vendorMiddleware = (req, res, next) => {
+  if (req.user && (req.user.role === 'vendor' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Vendor access required'
+    });
+  }
+};
+
+// Customer access middleware
+export const customerMiddleware = (req, res, next) => {
+  if (req.user && (req.user.role === 'customer' || req.user.role === 'admin')) {
+    next();
+  } else {
+    res.status(403).json({
+      success: false,
+      message: 'Customer access required'
+    });
+  }
+};
+
+// Role-based middleware factory
+export const roleMiddleware = (...roles) => {
+  return (req, res, next) => {
+    if (req.user && roles.includes(req.user.role)) {
+      next();
+    } else {
+      res.status(403).json({
+        success: false,
+        message: `Access denied. Required roles: ${roles.join(', ')}`
+      });
+    }
+  };
+};

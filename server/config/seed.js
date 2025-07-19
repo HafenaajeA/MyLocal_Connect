@@ -34,7 +34,8 @@ const seedData = async () => {
         password: 'password123',
         firstName: 'John',
         lastName: 'Doe',
-        bio: 'Local community member and business owner',
+        role: 'customer',
+        bio: 'Local community member and food enthusiast',
         location: 'San Francisco, CA'
       },
       {
@@ -43,8 +44,108 @@ const seedData = async () => {
         password: 'password123',
         firstName: 'Jane',
         lastName: 'Smith',
+        role: 'customer',
         bio: 'Event organizer and community volunteer',
         location: 'Los Angeles, CA'
+      },
+      {
+        username: 'pizzapalace',
+        email: 'owner@pizzapalace.com',
+        password: 'vendor123',
+        firstName: 'Mario',
+        lastName: 'Rossi',
+        role: 'vendor',
+        bio: 'Owner of Pizza Palace',
+        location: 'San Francisco, CA',
+        businessName: 'Pizza Palace',
+        businessDescription: 'Authentic Italian pizza made with fresh ingredients and traditional recipes passed down through generations.',
+        businessAddress: {
+          street: '123 Main Street',
+          city: 'San Francisco',
+          state: 'CA',
+          zipCode: '94102'
+        },
+        businessPhone: '+1-555-0123',
+        businessWebsite: 'https://pizzapalace.com',
+        businessCategories: ['restaurant'],
+        businessHours: {
+          monday: { open: '11:00', close: '22:00', closed: false },
+          tuesday: { open: '11:00', close: '22:00', closed: false },
+          wednesday: { open: '11:00', close: '22:00', closed: false },
+          thursday: { open: '11:00', close: '22:00', closed: false },
+          friday: { open: '11:00', close: '23:00', closed: false },
+          saturday: { open: '11:00', close: '23:00', closed: false },
+          sunday: { open: '12:00', close: '21:00', closed: false }
+        },
+        isVerifiedVendor: true,
+        vendorRating: 4.5,
+        totalReviews: 127
+      },
+      {
+        username: 'techrepair',
+        email: 'contact@techrepair.com',
+        password: 'vendor123',
+        firstName: 'Sarah',
+        lastName: 'Johnson',
+        role: 'vendor',
+        bio: 'Certified technician with 10+ years experience',
+        location: 'Los Angeles, CA',
+        businessName: 'TechRepair Pro',
+        businessDescription: 'Professional computer and mobile device repair services. We fix all brands and models with quick turnaround times.',
+        businessAddress: {
+          street: '456 Tech Avenue',
+          city: 'Los Angeles',
+          state: 'CA',
+          zipCode: '90210'
+        },
+        businessPhone: '+1-555-0456',
+        businessWebsite: 'https://techrepairpro.com',
+        businessCategories: ['technology', 'services'],
+        businessHours: {
+          monday: { open: '09:00', close: '18:00', closed: false },
+          tuesday: { open: '09:00', close: '18:00', closed: false },
+          wednesday: { open: '09:00', close: '18:00', closed: false },
+          thursday: { open: '09:00', close: '18:00', closed: false },
+          friday: { open: '09:00', close: '18:00', closed: false },
+          saturday: { open: '10:00', close: '16:00', closed: false },
+          sunday: { open: '', close: '', closed: true }
+        },
+        isVerifiedVendor: true,
+        vendorRating: 4.8,
+        totalReviews: 89
+      },
+      {
+        username: 'beautysalon',
+        email: 'info@bellasalon.com',
+        password: 'vendor123',
+        firstName: 'Isabella',
+        lastName: 'Garcia',
+        role: 'vendor',
+        bio: 'Licensed cosmetologist and salon owner',
+        location: 'New York, NY',
+        businessName: 'Bella Beauty Salon',
+        businessDescription: 'Full-service beauty salon offering haircuts, styling, coloring, manicures, pedicures, and facial treatments.',
+        businessAddress: {
+          street: '789 Beauty Boulevard',
+          city: 'New York',
+          state: 'NY',
+          zipCode: '10001'
+        },
+        businessPhone: '+1-555-0789',
+        businessWebsite: 'https://bellasalon.com',
+        businessCategories: ['beauty', 'services'],
+        businessHours: {
+          monday: { open: '', close: '', closed: true },
+          tuesday: { open: '09:00', close: '19:00', closed: false },
+          wednesday: { open: '09:00', close: '19:00', closed: false },
+          thursday: { open: '09:00', close: '19:00', closed: false },
+          friday: { open: '09:00', close: '19:00', closed: false },
+          saturday: { open: '08:00', close: '18:00', closed: false },
+          sunday: { open: '10:00', close: '16:00', closed: false }
+        },
+        isVerifiedVendor: false, // Pending verification
+        vendorRating: 0,
+        totalReviews: 0
       }
     ];
 
@@ -66,16 +167,24 @@ const seedData = async () => {
         content: 'Don\'t miss our weekly farmers market this Saturday from 8 AM to 2 PM at Central Park. Fresh produce, local crafts, and delicious food trucks!',
         category: 'events',
         tags: ['farmers market', 'saturday', 'local', 'food'],
-        author: createdUsers[1]._id,
+        author: createdUsers[1]._id, // John Doe (customer)
         location: 'Central Park'
       },
       {
-        title: 'New Coffee Shop Opening Soon',
-        content: 'Excited to announce that Brew & Bean Coffee will be opening next month on Main Street. They\'ll offer locally roasted coffee and homemade pastries.',
+        title: 'Grand Opening - Pizza Palace',
+        content: 'We\'re excited to announce the grand opening of Pizza Palace! Come try our authentic Italian pizzas made with the finest ingredients. Special 20% discount for the first week!',
         category: 'business',
-        tags: ['coffee', 'new business', 'main street'],
-        author: createdUsers[2]._id,
-        location: 'Main Street'
+        tags: ['pizza', 'italian', 'grand opening', 'discount'],
+        author: createdUsers[3]._id, // Pizza Palace vendor
+        location: '123 Main Street, San Francisco'
+      },
+      {
+        title: 'Need Computer Repair? We\'ve Got You Covered!',
+        content: 'TechRepair Pro offers professional computer and mobile device repair services. Quick turnaround, competitive prices, and quality guaranteed. Free diagnostics!',
+        category: 'services',
+        tags: ['computer repair', 'mobile repair', 'technology', 'professional'],
+        author: createdUsers[4]._id, // TechRepair vendor
+        location: '456 Tech Avenue, Los Angeles'
       },
       {
         title: 'Community Clean-up Day Volunteers Needed',
