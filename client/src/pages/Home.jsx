@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from 'react-query';
+import { Link } from 'react-router-dom';
 import { postService } from '../services/postService';
+import { businessService } from '../services/businessService';
 import PostCard from '../components/PostCard';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { Building2, Star, MapPin, ArrowRight } from 'lucide-react';
+import './Home.css';
 
 const Home = () => {
   const [filters, setFilters] = useState({
@@ -16,6 +20,15 @@ const Home = () => {
     () => postService.getPosts(filters),
     {
       keepPreviousData: true
+    }
+  );
+
+  // Fetch featured businesses
+  const { data: featuredBusinesses, isLoading: businessesLoading } = useQuery(
+    ['featured-businesses'],
+    () => businessService.getAllBusinesses({ limit: 4, sortBy: 'rating' }),
+    {
+      staleTime: 5 * 60 * 1000, // 5 minutes
     }
   );
 
@@ -40,7 +53,63 @@ const Home = () => {
   return (
     <div className="container py-4">
       <div className="home-header">
-        <h1 className="text-2xl font-bold mb-4">Community Posts</h1>
+        <h1 className="text-2xl font-bold mb-4">Welcome to MyLocal Connect</h1>
+        <p className="text-lg text-gray-600 mb-6">Discover local businesses and connect with your community</p>
+        
+        {/* Featured Businesses Section */}
+        <div className="featured-businesses-section mb-8">
+          <div className="section-header">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <Building2 size={24} />
+              Featured Local Businesses
+            </h2>
+            <Link to="/businesses" className="view-all-link">
+              View All <ArrowRight size={16} />
+            </Link>
+          </div>
+          
+          {businessesLoading ? (
+            <div className="businesses-loading">
+              <LoadingSpinner />
+            </div>
+          ) : (
+            <div className="featured-businesses-grid">
+              {featuredBusinesses?.businesses?.slice(0, 4).map(business => (
+                <Link 
+                  key={business._id} 
+                  to={`/business/${business._id}`}
+                  className="business-card"
+                >
+                  <div className="business-image">
+                    {business.images && business.images[0] ? (
+                      <img src={business.images[0]} alt={business.name} />
+                    ) : (
+                      <div className="placeholder-image">
+                        <Building2 size={32} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="business-info">
+                    <h3>{business.name}</h3>
+                    <p className="category">{business.category}</p>
+                    <div className="business-meta">
+                      <div className="rating">
+                        <Star size={14} fill="currentColor" />
+                        <span>{business.averageRating ? business.averageRating.toFixed(1) : 'New'}</span>
+                      </div>
+                      <div className="location">
+                        <MapPin size={14} />
+                        <span>{business.address?.split(',')[0] || 'Local'}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              )) || []}
+            </div>
+          )}
+        </div>
+        
+        <h2 className="text-xl font-bold mb-4">Recent Community Posts</h2>
         
         {/* Filters */}
         <div className="filters-section card card-padding mb-4">

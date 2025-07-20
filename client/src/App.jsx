@@ -12,6 +12,9 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CreatePost from './pages/CreatePost';
 import PostDetails from './pages/PostDetails';
+import BusinessListings from './pages/BusinessListings';
+import BusinessDetails from './pages/BusinessDetails';
+import AddEditBusiness from './pages/AddEditBusiness';
 import AdminDashboard from './pages/AdminDashboard';
 import Chat from './components/Chat/Chat';
 import './App.css';
@@ -35,8 +38,13 @@ function App() {
                     <Route path="/profile/:id?" element={<Profile />} />
                     <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/post/:id" element={<PostDetails />} />
+                    <Route path="/businesses" element={<BusinessListings />} />
+                    <Route path="/business/:id" element={<BusinessDetails />} />
+                    <Route path="/add-business" element={<AddEditBusiness />} />
+                    <Route path="/edit-business/:id" element={<AddEditBusiness />} />
                     <Route path="/chat" element={<Chat />} />
                     <Route path="/admin" element={<AdminDashboard />} />
+                    <Route path="/admin-dashboard" element={<AdminDashboard />} />
                   </Routes>
                 </main>
                 <Toaster position="top-right" />

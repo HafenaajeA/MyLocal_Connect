@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle, Shield } from 'lucide-react';
+import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle, Shield, Building2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -35,18 +35,29 @@ const Navbar = () => {
               Home
             </Link>
             
+            <Link to="/businesses" className="nav-link">
+              <Building2 size={20} />
+              Businesses
+            </Link>
+            
             {isAuthenticated && (
               <>
                 <Link to="/create-post" className="nav-link">
                   <PlusCircle size={20} />
                   Create Post
                 </Link>
+                {user?.role === 'vendor' && (
+                  <Link to="/add-business" className="nav-link vendor-link">
+                    <MapPin size={20} />
+                    Add Business
+                  </Link>
+                )}
                 <Link to="/chat" className="nav-link">
                   <MessageCircle size={20} />
                   Messages
                 </Link>
                 {user?.role === 'admin' && (
-                  <Link to="/admin" className="nav-link admin-link">
+                  <Link to="/admin-dashboard" className="nav-link admin-link">
                     <Shield size={20} />
                     Admin
                   </Link>
@@ -103,6 +114,15 @@ const Navbar = () => {
               <Home size={20} />
               Home
             </Link>
+
+            <Link 
+              to="/businesses" 
+              className="mobile-nav-link"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              <Building2 size={20} />
+              Businesses
+            </Link>
             
             {isAuthenticated ? (
               <>
@@ -114,6 +134,16 @@ const Navbar = () => {
                   <PlusCircle size={20} />
                   Create Post
                 </Link>
+                {user?.role === 'vendor' && (
+                  <Link 
+                    to="/add-business" 
+                    className="mobile-nav-link vendor-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <MapPin size={20} />
+                    Add Business
+                  </Link>
+                )}
                 <Link 
                   to="/chat" 
                   className="mobile-nav-link"
@@ -124,7 +154,7 @@ const Navbar = () => {
                 </Link>
                 {user?.role === 'admin' && (
                   <Link 
-                    to="/admin" 
+                    to="/admin-dashboard" 
                     className="mobile-nav-link admin-link"
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
