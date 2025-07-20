@@ -15,6 +15,7 @@ import vendorRoutes from './routes/vendors.js';
 import businessRoutes from './routes/businesses.js';
 import reviewRoutes from './routes/reviews.js';
 import chatRoutes from './routes/chats.js';
+import adminRoutes from './routes/admin.js';
 
 // Import Socket.IO service
 import socketService from './services/socketService.js';
@@ -57,6 +58,7 @@ app.use('/api/vendors', vendorRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

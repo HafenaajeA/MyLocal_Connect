@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle } from 'lucide-react';
+import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle, Shield } from 'lucide-react';
 import { useState } from 'react';
 
 const Navbar = () => {
@@ -45,6 +45,12 @@ const Navbar = () => {
                   <MessageCircle size={20} />
                   Messages
                 </Link>
+                {user?.role === 'admin' && (
+                  <Link to="/admin" className="nav-link admin-link">
+                    <Shield size={20} />
+                    Admin
+                  </Link>
+                )}
                 <Link to="/profile" className="nav-link">
                   <User size={20} />
                   Profile
@@ -116,6 +122,16 @@ const Navbar = () => {
                   <MessageCircle size={20} />
                   Messages
                 </Link>
+                {user?.role === 'admin' && (
+                  <Link 
+                    to="/admin" 
+                    className="mobile-nav-link admin-link"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Shield size={20} />
+                    Admin
+                  </Link>
+                )}
                 <Link 
                   to="/profile" 
                   className="mobile-nav-link"

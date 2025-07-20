@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Message delivery confirmation and read receipts
   - Support for different message types (text, images, files)
   - Unread message count tracking per chat
+- **Admin Dashboard**: Comprehensive administration interface for platform management
+  - Admin-only routes protected with JWT middleware and role-based access control
+  - User Management: View, search, activate/deactivate, and delete users (except admins)
+  - Business Management: View, search, filter by category, activate/deactivate, and delete businesses
+  - Review Management: View, search, filter by status, approve/flag, and delete inappropriate reviews
+  - Dashboard Statistics: Platform overview with user counts, business stats, and flagged content metrics
+  - Modern responsive UI with real-time data and pagination
+  - Admin navigation link visible only to admin users
 - **Chat API Endpoints**: RESTful chat management system
   - GET /api/chats - Fetch user's chat list with pagination and search
   - GET /api/chats/:id - Get specific chat details and participants
@@ -24,6 +32,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - POST /api/chats/:id/messages - Send new message to chat
   - PUT /api/chats/:id/read - Mark messages as read
   - GET /api/chats/search - Search chats by participant names or business
+- **Admin API Endpoints**: Secure administrative functionality
+  - GET /api/admin/stats - Platform statistics and metrics
+  - GET /api/admin/users - User management with pagination and filtering
+  - DELETE /api/admin/users/:id - Delete user account and associated data
+  - PATCH /api/admin/users/:id/status - Activate/deactivate user accounts
+  - GET /api/admin/businesses - Business management with pagination and filtering
+  - DELETE /api/admin/businesses/:id - Delete business and associated reviews
+  - PATCH /api/admin/businesses/:id/status - Activate/deactivate businesses
+  - GET /api/admin/reviews - Review management with pagination and filtering
+  - DELETE /api/admin/reviews/:id - Delete inappropriate reviews
+  - PATCH /api/admin/reviews/:id/status - Approve/flag reviews for moderation
 - **Chat Frontend Components**: React components for complete chat experience
   - Chat main container with sidebar and message window layout
   - ChatList component with search, unread counts, and user status indicators
@@ -129,6 +148,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated all fetch calls to use VITE_SERVER_URL environment variable
   - Fixed API calls in ChatContext.jsx and StartChatModal.jsx
   - Ensured proper connection to http://localhost:5000 server endpoints
+- **Review Model Enhancement**: Added status field for content moderation
+  - Added status enum: 'approved', 'flagged', 'pending' with default 'approved'
+  - Added database index for efficient status-based queries
+  - Supports admin review moderation workflow
 
 ### Security
 - **Review Security**: Implemented comprehensive security measures for review system

@@ -63,6 +63,11 @@ const reviewSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  status: {
+    type: String,
+    enum: ['approved', 'flagged', 'pending'],
+    default: 'approved'
+  },
   moderatorNotes: {
     type: String,
     maxlength: [500, 'Moderator notes cannot exceed 500 characters'],
@@ -78,6 +83,7 @@ reviewSchema.index({ user: 1, business: 1 }, { unique: true });
 // Index for efficient queries
 reviewSchema.index({ business: 1, rating: -1 });
 reviewSchema.index({ user: 1, createdAt: -1 });
+reviewSchema.index({ status: 1, createdAt: -1 });
 reviewSchema.index({ isHidden: 1, createdAt: -1 });
 
 // Pre-save middleware to prevent duplicate reviews

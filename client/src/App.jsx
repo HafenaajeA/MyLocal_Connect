@@ -12,6 +12,7 @@ import Register from './pages/Register';
 import Profile from './pages/Profile';
 import CreatePost from './pages/CreatePost';
 import PostDetails from './pages/PostDetails';
+import AdminDashboard from './pages/AdminDashboard';
 import Chat from './components/Chat/Chat';
 import './App.css';
 
@@ -35,6 +36,7 @@ function App() {
                     <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/post/:id" element={<PostDetails />} />
                     <Route path="/chat" element={<Chat />} />
+                    <Route path="/admin" element={<AdminDashboard />} />
                   </Routes>
                 </main>
                 <Toaster position="top-right" />
