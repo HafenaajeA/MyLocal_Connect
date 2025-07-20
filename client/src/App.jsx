@@ -29,7 +29,7 @@ function App() {
             <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <div className="app">
                 <Navbar />
-                <main className="main-content">
+                <main className="main-content pt-16">
                   <Routes>
                     <Route path="/" element={<Home />} />
                     <Route path="/login" element={<Login />} />
