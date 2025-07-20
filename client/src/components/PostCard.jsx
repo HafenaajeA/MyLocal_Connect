@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, MessageCircle, Eye, MapPin, Calendar, User } from 'lucide-react';
+import { Heart, MessageCircle, Eye, MapPin, Calendar, User, ArrowRight } from 'lucide-react';
 import { formatRelativeDate, capitalizeFirst } from '../utils/helpers';
 
 const PostCard = ({ post }) => {
@@ -17,261 +17,89 @@ const PostCard = ({ post }) => {
     createdAt
   } = post;
 
+  const getCategoryColor = (category) => {
+    const colors = {
+      general: 'bg-gray-100 text-gray-800',
+      events: 'bg-blue-100 text-blue-800',
+      business: 'bg-green-100 text-green-800',
+      services: 'bg-purple-100 text-purple-800',
+      community: 'bg-yellow-100 text-yellow-800',
+      news: 'bg-red-100 text-red-800'
+    };
+    return colors[category] || colors.general;
+  };
+
   return (
-    <div className="post-card">
-      <div className="post-header">
-        <div className="author-info">
-          <div className="author-avatar">
-            {author?.avatar ? (
-              <img src={author.avatar} alt={author.username} />
-            ) : (
-              <div className="avatar-placeholder">
-                <User size={20} />
-              </div>
-            )}
+    <article className="bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg hover:shadow-xl border border-white/20 transition-all duration-300 hover:bg-white/80 group">
+      {/* Post Header */}
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-semibold shadow-lg">
+            {author?.firstName?.charAt(0) || 'U'}{author?.lastName?.charAt(0) || ''}
           </div>
-          <div className="author-details">
-            <Link to={`/profile/${author?._id}`} className="author-name">
+          <div>
+            <Link 
+              to={`/profile/${author?._id}`} 
+              className="font-semibold text-gray-800 hover:text-blue-600 transition-colors"
+            >
               {author?.firstName} {author?.lastName}
             </Link>
-            <div className="post-meta">
-              <span className="post-time">
-                <Calendar size={14} />
-                {formatRelativeDate(createdAt)}
-              </span>
+            <div className="flex items-center space-x-3 text-sm text-gray-500 mt-1">
+              <div className="flex items-center space-x-1">
+                <Calendar className="w-3 h-3" />
+                <span>{formatRelativeDate(createdAt)}</span>
+              </div>
               {location && (
-                <span className="post-location">
-                  <MapPin size={14} />
-                  {location}
-                </span>
+                <div className="flex items-center space-x-1">
+                  <MapPin className="w-3 h-3" />
+                  <span>{location}</span>
+                </div>
               )}
             </div>
           </div>
         </div>
-        <div className="post-category">
-          <span className={`category-badge category-${category}`}>
-            {capitalizeFirst(category)}
-          </span>
-        </div>
+        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getCategoryColor(category)}`}>
+          {capitalizeFirst(category)}
+        </span>
       </div>
 
-      <div className="post-content">
-        <Link to={`/post/${_id}`} className="post-title-link">
-          <h3 className="post-title">{title}</h3>
+      {/* Post Content */}
+      <div className="mb-4">
+        <Link to={`/post/${_id}`} className="group">
+          <h3 className="text-xl font-bold text-gray-800 mb-3 leading-tight group-hover:text-blue-600 transition-colors">
+            {title}
+          </h3>
         </Link>
-        <p className="post-excerpt">
+        <p className="text-gray-600 leading-relaxed">
           {content.length > 200 ? `${content.slice(0, 200)}...` : content}
         </p>
       </div>
 
-      <div className="post-footer">
-        <div className="post-stats">
-          <span className="stat-item">
-            <Heart size={16} />
-            {likes.length} {likes.length === 1 ? 'like' : 'likes'}
-          </span>
-          <span className="stat-item">
-            <MessageCircle size={16} />
-            {comments.length} {comments.length === 1 ? 'comment' : 'comments'}
-          </span>
-          <span className="stat-item">
-            <Eye size={16} />
-            {views} {views === 1 ? 'view' : 'views'}
-          </span>
+      {/* Post Footer */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-200/50">
+        <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-1 text-gray-500 text-sm">
+            <Heart className="w-4 h-4" />
+            <span>{likes.length}</span>
+          </div>
+          <div className="flex items-center space-x-1 text-gray-500 text-sm">
+            <MessageCircle className="w-4 h-4" />
+            <span>{comments.length}</span>
+          </div>
+          <div className="flex items-center space-x-1 text-gray-500 text-sm">
+            <Eye className="w-4 h-4" />
+            <span>{views}</span>
+          </div>
         </div>
-        <Link to={`/post/${_id}`} className="read-more">
-          Read More
+        <Link 
+          to={`/post/${_id}`} 
+          className="inline-flex items-center space-x-1 text-blue-600 hover:text-blue-700 font-medium text-sm transition-colors group"
+        >
+          <span>Read More</span>
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
         </Link>
       </div>
-
-      <style jsx>{`
-        .post-card {
-          background: white;
-          border-radius: 12px;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border: 1px solid #e2e8f0;
-          padding: 24px;
-          margin-bottom: 24px;
-          transition: box-shadow 0.2s ease;
-        }
-
-        .post-card:hover {
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .post-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 16px;
-        }
-
-        .author-info {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .author-avatar {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          overflow: hidden;
-        }
-
-        .author-avatar img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .avatar-placeholder {
-          width: 100%;
-          height: 100%;
-          background: #f1f5f9;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: #64748b;
-        }
-
-        .author-name {
-          font-weight: 600;
-          color: #1e293b;
-          text-decoration: none;
-          font-size: 14px;
-        }
-
-        .author-name:hover {
-          color: #3b82f6;
-        }
-
-        .post-meta {
-          display: flex;
-          gap: 16px;
-          margin-top: 4px;
-        }
-
-        .post-time,
-        .post-location {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          color: #64748b;
-          font-size: 12px;
-        }
-
-        .category-badge {
-          padding: 4px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 500;
-          text-transform: uppercase;
-          letter-spacing: 0.5px;
-        }
-
-        .category-general {
-          background: #f1f5f9;
-          color: #475569;
-        }
-
-        .category-events {
-          background: #fef3c7;
-          color: #92400e;
-        }
-
-        .category-business {
-          background: #d1fae5;
-          color: #065f46;
-        }
-
-        .category-services {
-          background: #dbeafe;
-          color: #1e40af;
-        }
-
-        .category-community {
-          background: #fce7f3;
-          color: #be185d;
-        }
-
-        .category-news {
-          background: #fee2e2;
-          color: #991b1b;
-        }
-
-        .post-content {
-          margin-bottom: 16px;
-        }
-
-        .post-title-link {
-          text-decoration: none;
-          color: inherit;
-        }
-
-        .post-title {
-          font-size: 18px;
-          font-weight: 600;
-          color: #1e293b;
-          margin-bottom: 8px;
-          line-height: 1.4;
-        }
-
-        .post-title-link:hover .post-title {
-          color: #3b82f6;
-        }
-
-        .post-excerpt {
-          color: #475569;
-          line-height: 1.6;
-          margin: 0;
-        }
-
-        .post-footer {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding-top: 16px;
-          border-top: 1px solid #f1f5f9;
-        }
-
-        .post-stats {
-          display: flex;
-          gap: 20px;
-        }
-
-        .stat-item {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-          color: #64748b;
-          font-size: 14px;
-        }
-
-        .read-more {
-          color: #3b82f6;
-          text-decoration: none;
-          font-weight: 500;
-          font-size: 14px;
-        }
-
-        .read-more:hover {
-          text-decoration: underline;
-        }
-
-        @media (max-width: 640px) {
-          .post-footer {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 12px;
-          }
-
-          .post-stats {
-            gap: 16px;
-          }
-        }
-      `}</style>
-    </div>
+    </article>
   );
 };
 

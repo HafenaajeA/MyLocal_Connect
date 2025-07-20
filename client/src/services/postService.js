@@ -13,6 +13,12 @@ export const postService = {
     return response.data;
   },
 
+  // Get single post by ID (alias for compatibility)
+  getPostById: async (id) => {
+    const response = await api.get(`/posts/${id}`);
+    return response.data;
+  },
+
   // Create new post
   createPost: async (postData) => {
     const response = await api.post('/posts', postData);
@@ -33,6 +39,12 @@ export const postService = {
 
   // Like/Unlike post
   toggleLike: async (id) => {
+    const response = await api.post(`/posts/${id}/like`);
+    return response.data;
+  },
+
+  // Like post (alias for compatibility)
+  likePost: async (id) => {
     const response = await api.post(`/posts/${id}/like`);
     return response.data;
   },
