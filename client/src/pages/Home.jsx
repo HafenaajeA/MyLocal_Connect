@@ -239,13 +239,11 @@ const Home = () => {
       {/* Featured Businesses Section */}
       <div className="py-20 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
-          <div className="flex justify-between items-center mb-12">
-            <div>
-              <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
-                Featured Local Businesses
-              </h2>
-              <p className="text-xl text-gray-600">Discover top-rated businesses in your area</p>
-            </div>
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
+              Featured Local Businesses
+            </h2>
+            <p className="text-xl text-gray-600 mb-8">Discover top-rated businesses in your area</p>
             <Link 
               to="/businesses" 
               className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 transform hover:scale-105"
@@ -259,50 +257,89 @@ const Home = () => {
               <LoadingSpinner />
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {featuredBusinesses?.businesses?.slice(0, 4).map(business => (
-                <Link 
-                  key={business._id} 
-                  to={`/business/${business._id}`}
-                  className="group"
-                >
-                  <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100">
-                    <div className="aspect-w-16 aspect-h-12 relative overflow-hidden">
-                      {business.images && business.images[0] ? (
-                        <img 
-                          src={business.images[0]} 
-                          alt={business.name}
-                          className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
-                        />
-                      ) : (
-                        <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center group-hover:from-blue-200 group-hover:to-purple-200 transition-colors duration-300">
-                          <Building2 className="w-12 h-12 text-blue-500" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
-                        {business.name}
-                      </h3>
-                      <p className="text-gray-600 mb-4 capitalize">{business.category}</p>
-                      <div className="flex justify-between items-center">
-                        <div className="flex items-center gap-1 text-yellow-500">
-                          <Star className="w-4 h-4 fill-current" />
-                          <span className="text-gray-700 font-medium">
-                            {business.averageRating ? business.averageRating.toFixed(1) : 'New'}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1 text-gray-500">
-                          <MapPin className="w-4 h-4" />
-                          <span className="text-sm">
-                            {business.address?.split(',')[0] || 'Local'}
-                          </span>
+            <div className="flex justify-center">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl">
+                {/* Show real businesses if available, otherwise show dummy businesses */}
+                {(featuredBusinesses?.businesses?.length > 0 
+                  ? featuredBusinesses.businesses.slice(0, 4)
+                  : [
+                    {
+                      _id: 'dummy-1',
+                      name: 'Sunrise Café',
+                      category: 'restaurant',
+                      averageRating: 4.8,
+                      address: 'Downtown Ondangwa',
+                      image: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                      _id: 'dummy-2',
+                      name: 'Tech Solutions Hub',
+                      category: 'technology',
+                      averageRating: 4.9,
+                      address: 'Business District',
+                      image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                      _id: 'dummy-3',
+                      name: 'Fashion Boutique',
+                      category: 'retail',
+                      averageRating: 4.6,
+                      address: 'Shopping Center',
+                      image: 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                      _id: 'dummy-4',
+                      name: 'Wellness Spa',
+                      category: 'health & beauty',
+                      averageRating: 4.7,
+                      address: 'Wellness District',
+                      image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    }
+                  ]
+                ).map(business => (
+                  <Link 
+                    key={business._id} 
+                    to={`/business/${business._id}`}
+                    className="group"
+                  >
+                    <div className="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 overflow-hidden border border-gray-100">
+                      <div className="aspect-w-16 aspect-h-12 relative overflow-hidden">
+                        {(business.images && business.images[0]) || business.image ? (
+                          <img 
+                            src={business.images?.[0] || business.image} 
+                            alt={business.name}
+                            className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                          />
+                        ) : (
+                          <div className="w-full h-48 bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center group-hover:from-blue-200 group-hover:to-purple-200 transition-colors duration-300">
+                            <Building2 className="w-12 h-12 text-blue-500" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <h3 className="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors">
+                          {business.name}
+                        </h3>
+                        <p className="text-gray-600 mb-4 capitalize">{business.category}</p>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-1 text-yellow-500">
+                            <Star className="w-4 h-4 fill-current" />
+                            <span className="text-gray-700 font-medium">
+                              {business.averageRating ? business.averageRating.toFixed(1) : 'New'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1 text-gray-500">
+                            <MapPin className="w-4 h-4" />
+                            <span className="text-sm">
+                              {business.address?.split(',')[0] || 'Local'}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </Link>
-              )) || []}
+                  </Link>
+                )) || []}
+              </div>
             </div>
           )}
         </div>

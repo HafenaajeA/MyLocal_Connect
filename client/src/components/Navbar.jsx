@@ -2,12 +2,24 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Home, User, PlusCircle, LogOut, Menu, X, MessageCircle, Shield, Building2, MapPin } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setIsScrolled(scrollTop > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -20,12 +32,18 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 glass-card-premium border-0 border-b border-white/20 shadow-lg z-50 backdrop-blur-md">
+    <nav className={`fixed top-0 left-0 right-0 border-0 border-b shadow-lg z-50 backdrop-blur-md transition-all duration-300 ${
+      isScrolled 
+        ? 'bg-white/95 border-gray-200/50 shadow-xl' 
+        : 'glass-card-premium border-white/20'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo with 20px left spacing */}
           <Link to="/" className="flex-shrink-0 group ml-5">
-            <h1 className="text-2xl font-bold gradient-text group-hover:scale-110 transition-all duration-500 hover:drop-shadow-lg">
+            <h1 className={`text-2xl font-bold group-hover:scale-110 transition-all duration-500 hover:drop-shadow-lg ${
+              isScrolled ? 'text-gray-800' : 'gradient-text'
+            }`}>
               MyLocal Connect
             </h1>
           </Link>
@@ -34,7 +52,9 @@ const Navbar = () => {
           <div className="hidden md:flex items-center justify-center flex-1 space-x-8">
             <Link 
               to="/" 
-              className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 font-medium transition-all duration-300 hover:scale-110 hover:-translate-y-1 relative group"
+              className={`flex items-center gap-2 font-medium transition-all duration-300 hover:scale-110 hover:-translate-y-1 relative group ${
+                isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+              }`}
             >
               <Home size={20} className="group-hover:rotate-12 transition-transform duration-300" />
               <span className="relative">
@@ -45,7 +65,9 @@ const Navbar = () => {
             
             <Link 
               to="/businesses" 
-              className="flex items-center gap-2 text-gray-700 hover:text-indigo-600 font-medium transition-all duration-300 hover:scale-110 hover:-translate-y-1 relative group"
+              className={`flex items-center gap-2 font-medium transition-all duration-300 hover:scale-110 hover:-translate-y-1 relative group ${
+                isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+              }`}
             >
               <Building2 size={20} className="group-hover:rotate-12 transition-transform duration-300" />
               <span className="relative">
@@ -136,13 +158,17 @@ const Navbar = () => {
               <div className="flex items-center space-x-3">
                 <Link 
                   to="/login" 
-                  className="px-4 py-2 text-gray-700 hover:text-indigo-600 border border-gray-300 hover:border-indigo-500 rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                  className={`px-4 py-2 border rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg ${
+                    isScrolled 
+                      ? 'text-gray-700 hover:text-indigo-600 border-gray-300 hover:border-indigo-500' 
+                      : 'text-gray-700 hover:text-indigo-600 border-gray-300 hover:border-indigo-500'
+                  }`}
                 >
                   Login
                 </Link>
                 <Link 
                   to="/register" 
-                  className="btn-modern px-4 py-2 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-xl"
+                  className="px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-300 hover:scale-105 hover:shadow-xl transform hover:-translate-y-0.5"
                 >
                   Register
                 </Link>
@@ -152,7 +178,9 @@ const Navbar = () => {
 
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden p-2 text-gray-700 hover:text-indigo-600 transition-colors duration-300"
+            className={`md:hidden p-2 transition-colors duration-300 ${
+              isScrolled ? 'text-gray-700 hover:text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+            }`}
             onClick={toggleMobileMenu}
           >
             {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -161,7 +189,11 @@ const Navbar = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-white/20 py-4 space-y-2">
+          <div className={`md:hidden border-t py-4 space-y-2 backdrop-blur-md transition-all duration-300 ${
+            isScrolled 
+              ? 'bg-white/95 border-gray-200/50' 
+              : 'bg-white/95 border-white/20'
+          }`}>
             <Link 
               to="/" 
               className="flex items-center gap-3 px-4 py-3 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50/50 transition-all duration-300"
@@ -245,7 +277,7 @@ const Navbar = () => {
                 </Link>
                 <Link 
                   to="/register" 
-                  className="flex items-center gap-3 px-4 py-3 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50/50 transition-all duration-300 font-medium"
+                  className="flex items-center gap-3 px-4 py-3 mx-4 my-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl font-medium transition-all duration-300 justify-center"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Register
