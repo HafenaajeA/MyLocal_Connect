@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Search, Filter, Star, Eye, Flag, Check, Trash2, 
+  AlertTriangle, Calendar, User, Building2, MessageCircle,
+  ChevronLeft, ChevronRight, MoreVertical, ExternalLink
+} from 'lucide-react';
 
 const ReviewManagement = () => {
   const [reviews, setReviews] = useState([]);
@@ -109,166 +114,313 @@ const ReviewManagement = () => {
   };
 
   const renderStars = (rating) => {
-    return '⭐'.repeat(rating) + '☆'.repeat(5 - rating);
+    return Array.from({ length: 5 }, (_, i) => (
+      <Star
+        key={i}
+        size={16}
+        fill={i < rating ? '#ffd700' : 'none'}
+        color={i < rating ? '#ffd700' : '#e5e5e5'}
+        className="inline"
+      />
+    ));
   };
 
-  const getStatusColor = (status) => {
+  const getStatusConfig = (status) => {
     switch (status) {
-      case 'approved': return 'active';
-      case 'flagged': return 'inactive';
-      case 'pending': return 'pending';
-      default: return 'pending';
+      case 'approved': 
+        return { 
+          color: 'bg-green-100 text-green-800 border-green-200', 
+          icon: Check,
+          label: 'Approved'
+        };
+      case 'flagged': 
+        return { 
+          color: 'bg-red-100 text-red-800 border-red-200', 
+          icon: Flag,
+          label: 'Flagged'
+        };
+      case 'pending': 
+        return { 
+          color: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+          icon: AlertTriangle,
+          label: 'Pending'
+        };
+      default: 
+        return { 
+          color: 'bg-gray-100 text-gray-800 border-gray-200', 
+          icon: AlertTriangle,
+          label: 'Unknown'
+        };
     }
   };
 
   if (loading) {
     return (
-      <div className="admin-loading">
-        <div className="loading-spinner"></div>
-        <p>Loading reviews...</p>
+      <div className="flex items-center justify-center py-16">
+        <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading reviews...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="review-management">
-      <div className="management-header">
-        <h2>Review Management</h2>
-        <div className="management-controls">
-          <input
-            type="text"
-            placeholder="Search reviews..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="status-filter"
-          >
-            <option value="all">All Reviews</option>
-            <option value="approved">Approved</option>
-            <option value="flagged">Flagged</option>
-            <option value="pending">Pending</option>
-          </select>
+    <div className="space-y-6">
+      {/* Header and Controls */}
+      <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-100">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-lg flex items-center justify-center">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              Review Management
+            </h2>
+            <p className="text-gray-600">Monitor and moderate user reviews across your platform</p>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-3">
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search reviews..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 w-full sm:w-64"
+              />
+            </div>
+            
+            {/* Status Filter */}
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 pointer-events-none" />
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="pl-10 pr-8 py-3 bg-white border border-gray-200 rounded-xl focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200 appearance-none cursor-pointer"
+              >
+                <option value="all">All Reviews</option>
+                <option value="approved">Approved</option>
+                <option value="flagged">Flagged</option>
+                <option value="pending">Pending</option>
+              </select>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="admin-table-container">
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Review</th>
-              <th>Business</th>
-              <th>Reviewer</th>
-              <th>Rating</th>
-              <th>Status</th>
-              <th>Date</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reviews.map(review => (
-              <tr key={review._id}>
-                <td>
-                  <div className="review-content">
-                    {review.title && (
-                      <div className="review-title">{review.title}</div>
-                    )}
-                    <div className="review-text">
-                      {review.comment.length > 100 
-                        ? `${review.comment.substring(0, 100)}...` 
-                        : review.comment
-                      }
-                    </div>
-                    {review.reportCount > 0 && (
-                      <div className="report-info">
-                        ⚠️ Reported {review.reportCount} times
+      {/* Reviews Grid */}
+      {reviews.length > 0 ? (
+        <div className="space-y-4">
+          {reviews.map(review => {
+            const statusConfig = getStatusConfig(review.status || 'approved');
+            const StatusIcon = statusConfig.icon;
+            
+            return (
+              <div key={review._id} className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 overflow-hidden">
+                <div className="p-6">
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    {/* Review Content - 5 columns */}
+                    <div className="lg:col-span-5 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          {review.title && (
+                            <h3 className="text-lg font-semibold text-gray-800 mb-2">{review.title}</h3>
+                          )}
+                          <div className="flex items-center gap-2 mb-3">
+                            <div className="flex items-center gap-1">
+                              {renderStars(review.rating)}
+                            </div>
+                            <span className="text-sm font-medium text-gray-600">({review.rating}/5)</span>
+                          </div>
+                        </div>
+                        
+                        {/* Status Badge */}
+                        <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium border ${statusConfig.color}`}>
+                          <StatusIcon className="w-4 h-4" />
+                          {statusConfig.label}
+                        </div>
                       </div>
-                    )}
-                  </div>
-                </td>
-                <td>
-                  <div className="business-info">
-                    <div className="business-name">
-                      {review.business?.name || 'Deleted Business'}
+                      
+                      <p className="text-gray-600 leading-relaxed">
+                        {review.comment.length > 150 
+                          ? `${review.comment.substring(0, 150)}...` 
+                          : review.comment
+                        }
+                      </p>
+                      
+                      {review.reportCount > 0 && (
+                        <div className="bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+                          <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
+                          <span className="text-red-700 text-sm font-medium">
+                            Reported {review.reportCount} times
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <div className="business-category">
-                      {review.business?.category}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="reviewer-info">
-                    <div className="reviewer-name">
-                      {review.user?.firstName} {review.user?.lastName}
-                    </div>
-                    <div className="reviewer-email">
-                      {review.user?.email}
-                    </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="rating-display">
-                    <span className="stars">{renderStars(review.rating)}</span>
-                    <span className="rating-number">({review.rating}/5)</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`status-badge ${getStatusColor(review.status)}`}>
-                    {review.status || 'approved'}
-                  </span>
-                </td>
-                <td>{new Date(review.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <div className="admin-actions">
-                    <button
-                      className="admin-btn view"
-                      onClick={() => window.open(`/business/${review.business?._id}`, '_blank')}
-                      disabled={!review.business}
-                    >
-                      View Business
-                    </button>
-                    <button
-                      className={`admin-btn ${(review.status || 'approved') === 'approved' ? 'delete' : 'view'}`}
-                      onClick={() => handleToggleReviewStatus(review._id, review.status || 'approved')}
-                    >
-                      {(review.status || 'approved') === 'approved' ? 'Flag' : 'Approve'}
-                    </button>
-                    <button
-                      className="admin-btn delete"
-                      onClick={() => handleDeleteReview(review._id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
 
+                    {/* Business Info - 3 columns */}
+                    <div className="lg:col-span-3 space-y-3">
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Building2 className="w-4 h-4 text-gray-500" />
+                          <span className="text-sm font-medium text-gray-700">Business</span>
+                        </div>
+                        <h4 className="font-semibold text-gray-800 mb-1">
+                          {review.business?.name || 'Deleted Business'}
+                        </h4>
+                        {review.business?.category && (
+                          <p className="text-sm text-gray-600 capitalize">
+                            {review.business.category}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Reviewer Info - 2 columns */}
+                    <div className="lg:col-span-2 space-y-3">
+                      <div className="bg-blue-50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <User className="w-4 h-4 text-blue-500" />
+                          <span className="text-sm font-medium text-blue-700">Reviewer</span>
+                        </div>
+                        <h4 className="font-semibold text-gray-800 mb-1">
+                          {review.user?.firstName} {review.user?.lastName}
+                        </h4>
+                        <p className="text-sm text-gray-600 truncate">
+                          {review.user?.email}
+                        </p>
+                      </div>
+                      
+                      <div className="text-center">
+                        <div className="flex items-center gap-1 text-gray-500 text-sm justify-center">
+                          <Calendar className="w-4 h-4" />
+                          {new Date(review.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions - 2 columns */}
+                    <div className="lg:col-span-2 flex flex-col gap-2 justify-center">
+                      <button
+                        onClick={() => window.open(`/business/${review.business?._id}`, '_blank')}
+                        disabled={!review.business}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-200 text-sm font-medium"
+                      >
+                        <ExternalLink className="w-4 h-4" />
+                        View Business
+                      </button>
+                      
+                      <button
+                        onClick={() => handleToggleReviewStatus(review._id, review.status || 'approved')}
+                        className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                          (review.status || 'approved') === 'approved' 
+                            ? 'bg-red-500 text-white hover:bg-red-600' 
+                            : 'bg-green-500 text-white hover:bg-green-600'
+                        }`}
+                      >
+                        {(review.status || 'approved') === 'approved' ? (
+                          <>
+                            <Flag className="w-4 h-4" />
+                            Flag Review
+                          </>
+                        ) : (
+                          <>
+                            <Check className="w-4 h-4" />
+                            Approve
+                          </>
+                        )}
+                      </button>
+                      
+                      <button
+                        onClick={() => handleDeleteReview(review._id)}
+                        className="flex items-center justify-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 text-sm font-medium"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <div className="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-12 max-w-md mx-auto">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <MessageCircle className="w-8 h-8 text-gray-400" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800 mb-2">No Reviews Found</h3>
+            <p className="text-gray-600">
+              {searchTerm || filterStatus !== 'all' 
+                ? 'Try adjusting your search or filter criteria.'
+                : 'No reviews have been submitted yet.'
+              }
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Pagination */}
       {totalPages > 1 && (
-        <div className="pagination">
-          <button
-            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="pagination-btn"
-          >
-            Previous
-          </button>
-          <span className="pagination-info">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="pagination-btn"
-          >
-            Next
-          </button>
+        <div className="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg p-6">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-gray-600">
+                Page {currentPage} of {totalPages}
+              </span>
+              <div className="hidden sm:flex items-center gap-2">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
+                  
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-all duration-200 ${
+                        currentPage === page
+                          ? 'bg-yellow-500 text-white'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            >
+              Next
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
     </div>
