@@ -6,6 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import { ChatProvider } from './context/ChatContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -46,6 +47,7 @@ function App() {
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                   </Routes>
                 </main>
+                <Footer />
                 <Toaster position="top-right" />
               </div>
             </Router>
