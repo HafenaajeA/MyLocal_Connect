@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useChat } from '../../context/ChatContext';
-import './Chat.css';
+
 
 const StartChatModal = ({ onClose, onChatStarted }) => {
   const { startChat } = useChat();

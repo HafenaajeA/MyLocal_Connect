@@ -17,7 +17,6 @@ import BusinessDetails from './pages/BusinessDetails';
 import AddEditBusiness from './pages/AddEditBusiness';
 import AdminDashboard from './pages/AdminDashboard';
 import Chat from './components/Chat/Chat';
-import './App.css';
 
 const queryClient = new QueryClient();
 

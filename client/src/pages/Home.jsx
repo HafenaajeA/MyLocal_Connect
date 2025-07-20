@@ -6,7 +6,6 @@ import { businessService } from '../services/businessService';
 import PostCard from '../components/PostCard';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Building2, Star, MapPin, ArrowRight } from 'lucide-react';
-import './Home.css';
 
 const Home = () => {
   const [filters, setFilters] = useState({

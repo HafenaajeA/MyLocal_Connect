@@ -1,55 +1,21 @@
 import React from 'react';
 
 const LoadingSpinner = ({ size = 'medium', text = 'Loading...' }) => {
+  const getSizeClasses = (size) => {
+    switch (size) {
+      case 'small':
+        return 'w-5 h-5 border-2';
+      case 'large':
+        return 'w-16 h-16 border-4';
+      default:
+        return 'w-10 h-10 border-3';
+    }
+  };
+
   return (
-    <div className="loading-container">
-      <div className={`spinner spinner-${size}`}></div>
-      {text && <p className="loading-text">{text}</p>}
-
-      <style jsx>{`
-        .loading-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 20px;
-        }
-
-        .spinner {
-          border: 3px solid #f3f4f6;
-          border-top: 3px solid #3b82f6;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-
-        .spinner-small {
-          width: 20px;
-          height: 20px;
-          border-width: 2px;
-        }
-
-        .spinner-medium {
-          width: 40px;
-          height: 40px;
-        }
-
-        .spinner-large {
-          width: 60px;
-          height: 60px;
-          border-width: 4px;
-        }
-
-        .loading-text {
-          margin-top: 16px;
-          color: #6b7280;
-          font-size: 14px;
-        }
-
-        @keyframes spin {
-          0% { transform: rotate(0deg); }
-          100% { transform: rotate(360deg); }
-        }
-      `}</style>
+    <div className="flex flex-col items-center justify-center py-10 px-5">
+      <div className={`border-gray-200 border-t-indigo-600 rounded-full animate-spin ${getSizeClasses(size)}`}></div>
+      {text && <p className="mt-4 text-gray-500 text-sm">{text}</p>}
     </div>
   );
 };

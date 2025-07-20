@@ -7,7 +7,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
-import './BusinessDetails.css';
+
 
 const BusinessDetails = () => {
   const { id } = useParams();

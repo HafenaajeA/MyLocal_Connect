@@ -1,5 +1,5 @@
 import React from 'react';
-import './Chat.css';
+
 
 const ChatList = ({ chats, activeChat, onChatSelect }) => {
   if (!chats || chats.length === 0) {

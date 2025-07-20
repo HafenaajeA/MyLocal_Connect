@@ -3,7 +3,7 @@ import { useChat } from '../../context/ChatContext';
 import ChatList from './ChatList';
 import ChatWindow from './ChatWindow';
 import StartChatModal from './StartChatModal';
-import './Chat.css';
+
 
 const Chat = () => {
   const {

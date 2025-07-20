@@ -3,7 +3,6 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { Search, Filter, MapPin, Star, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
-import './BusinessListings.css';
 
 const BusinessListings = () => {
   const [businesses, setBusinesses] = useState([]);

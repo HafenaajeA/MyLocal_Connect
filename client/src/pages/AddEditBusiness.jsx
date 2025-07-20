@@ -4,7 +4,7 @@ import { Camera, X, Plus, Save, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import toast from 'react-hot-toast';
-import './AddEditBusiness.css';
+
 
 const AddEditBusiness = () => {
   const { id } = useParams();

@@ -4,7 +4,7 @@ import UserManagement from '../components/Admin/UserManagement';
 import BusinessManagement from '../components/Admin/BusinessManagement';
 import ReviewManagement from '../components/Admin/ReviewManagement';
 import AdminStats from '../components/Admin/AdminStats';
-import './AdminDashboard.css';
+
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('stats');

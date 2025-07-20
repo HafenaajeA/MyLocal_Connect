@@ -5,7 +5,7 @@ import chatService from '../services/chatService';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import toast from 'react-hot-toast';
-import './ServicesExample.css';
+
 
 const ServicesExample = () => {
   const [businesses, setBusinesses] = useState([]);

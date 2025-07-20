@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useChat } from '../../context/ChatContext';
-import './Chat.css';
+
 
 const ChatWindow = ({ chat }) => {
   const { 
