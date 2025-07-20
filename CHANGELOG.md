@@ -8,6 +8,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Comprehensive Service Layer with Axios Integration**: Complete API service layer for React frontend
+  - **Enhanced API Configuration** (`client/src/services/api.js`):
+    - Axios instance with base configuration and automatic token handling
+    - Request interceptors for automatic JWT token attachment
+    - Response interceptors for global error handling (401, 403, 500, network errors)
+    - Automatic logout and redirect on token expiration
+    - Environment variable support for API base URL
+  - **Chat Service** (`client/src/services/chatService.js`):
+    - Complete chat API integration with all endpoints
+    - Get user chats with pagination and filtering
+    - Start/create chats between customers and vendors
+    - Send/receive messages with different message types
+    - Mark chats as read and update chat status
+    - Update and delete messages
+    - File upload support for chat attachments
+    - Search chats and get online users (admin features)
+    - Comprehensive error handling with user-friendly toast notifications
+  - **Enhanced Auth Service** (`client/src/services/authService.js`):
+    - Complete authentication flow using Axios
+    - Register, login, logout with automatic token management
+    - Current user retrieval and authentication status checks
+    - Profile updates and password changes
+    - Role-based access control helpers
+  - **Enhanced Business Service** (`client/src/services/businessService.js`):
+    - Full CRUD operations for business management
+    - Advanced search and filtering capabilities
+    - Review system integration
+    - Image upload and management
+    - Owner verification and business claiming
+  - **Updated Chat Context**: Integrated ChatContext with new chatService
+    - Replaced direct fetch calls with chatService methods
+    - Added new chat management functions (markAsRead, updateChatStatus)
+    - Made chatService available through context for direct access
+    - Maintained backward compatibility with existing socket-based functions
+  - **Services Documentation**: Comprehensive guide for using all services
+    - Complete API reference with examples
+    - Best practices for error handling and state management
+    - Integration examples with React components and contexts
+    - Environment configuration and setup instructions
+
 - **Complete React Frontend with Business Features**: Full-featured React application with business discovery and management
   - **Business Listings Page**: Comprehensive business directory with search, filtering, and pagination
     - Search by name, category, location, and rating

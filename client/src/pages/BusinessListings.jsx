@@ -185,7 +185,7 @@ const BusinessListings = () => {
                     src={business.images[0]} 
                     alt={business.name}
                     onError={(e) => {
-                      e.target.src = '/placeholder-business.jpg';
+                      e.target.src = '/placeholder-business.svg';
                     }}
                   />
                 ) : (

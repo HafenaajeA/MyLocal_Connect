@@ -1,0 +1,253 @@
+import api, { handleApiError } from './api';
+import toast from 'react-hot-toast';
+
+export const chatService = {
+  // Get user's chats with pagination and filtering
+  getChats: async (options = {}) => {
+    try {
+      const { page = 1, limit = 20, status = 'active' } = options;
+      const response = await api.get('/api/chats', {
+        params: { page, limit, status }
+      });
+      
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to load chats: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Start or get existing chat between customer and vendor
+  startChat: async (vendorId, businessId) => {
+    try {
+      if (!vendorId || !businessId) {
+        throw new Error('Vendor ID and Business ID are required');
+      }
+
+      const response = await api.post('/api/chats/start', {
+        vendorId,
+        businessId
+      });
+      
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to start chat: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Get specific chat details
+  getChat: async (chatId) => {
+    try {
+      if (!chatId) {
+        throw new Error('Chat ID is required');
+      }
+
+      const response = await api.get(`/api/chats/${chatId}`);
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to load chat: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Get messages for a specific chat
+  getMessages: async (chatId, options = {}) => {
+    try {
+      if (!chatId) {
+        throw new Error('Chat ID is required');
+      }
+
+      const { page = 1, limit = 50, before } = options;
+      const response = await api.get(`/api/chats/${chatId}/messages`, {
+        params: { page, limit, before }
+      });
+      
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to load messages: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Send a new message
+  sendMessage: async (chatId, content, messageType = 'text') => {
+    try {
+      if (!chatId || !content?.trim()) {
+        throw new Error('Chat ID and message content are required');
+      }
+
+      const response = await api.post(`/api/chats/${chatId}/messages`, {
+        content: content.trim(),
+        messageType
+      });
+      
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to send message: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Mark chat as read
+  markAsRead: async (chatId) => {
+    try {
+      if (!chatId) {
+        throw new Error('Chat ID is required');
+      }
+
+      const response = await api.put(`/api/chats/${chatId}/read`);
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      console.error('Failed to mark chat as read:', errorMessage);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Update chat status (active, archived, closed)
+  updateChatStatus: async (chatId, status) => {
+    try {
+      if (!chatId || !status) {
+        throw new Error('Chat ID and status are required');
+      }
+
+      const validStatuses = ['active', 'archived', 'closed'];
+      if (!validStatuses.includes(status)) {
+        throw new Error('Invalid status. Must be: active, archived, or closed');
+      }
+
+      const response = await api.put(`/api/chats/${chatId}/status`, { status });
+      
+      toast.success(`Chat ${status} successfully`);
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to update chat status: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Edit/update a message
+  updateMessage: async (messageId, content) => {
+    try {
+      if (!messageId || !content?.trim()) {
+        throw new Error('Message ID and content are required');
+      }
+
+      const response = await api.put(`/api/chats/messages/${messageId}`, {
+        content: content.trim()
+      });
+      
+      toast.success('Message updated successfully');
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to update message: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Delete a message
+  deleteMessage: async (messageId) => {
+    try {
+      if (!messageId) {
+        throw new Error('Message ID is required');
+      }
+
+      const response = await api.delete(`/api/chats/messages/${messageId}`);
+      
+      toast.success('Message deleted successfully');
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to delete message: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Search chats (admin/advanced feature)
+  searchChats: async (query, options = {}) => {
+    try {
+      if (!query?.trim()) {
+        throw new Error('Search query is required');
+      }
+
+      const { page = 1, limit = 20 } = options;
+      const response = await api.get('/api/chats/search', {
+        params: { q: query.trim(), page, limit }
+      });
+      
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Search failed: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Get online users (admin only)
+  getOnlineUsers: async () => {
+    try {
+      const response = await api.get('/api/chats/system/online-users');
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`Failed to load online users: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Upload file/image for chat (if implemented)
+  uploadFile: async (chatId, file, onProgress) => {
+    try {
+      if (!chatId || !file) {
+        throw new Error('Chat ID and file are required');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('messageType', 'file');
+
+      const response = await api.post(`/api/chats/${chatId}/upload`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+        onUploadProgress: (progressEvent) => {
+          if (onProgress && progressEvent.total) {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / progressEvent.total
+            );
+            onProgress(percentCompleted);
+          }
+        },
+      });
+
+      toast.success('File uploaded successfully');
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      toast.error(`File upload failed: ${errorMessage}`);
+      throw new Error(errorMessage);
+    }
+  },
+
+  // Get chat statistics (for dashboard)
+  getChatStats: async () => {
+    try {
+      const response = await api.get('/api/chats/stats');
+      return response.data;
+    } catch (error) {
+      const errorMessage = handleApiError(error);
+      console.error('Failed to load chat stats:', errorMessage);
+      throw new Error(errorMessage);
+    }
+  }
+};
+
+export default chatService;

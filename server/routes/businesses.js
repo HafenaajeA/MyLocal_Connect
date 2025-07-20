@@ -137,7 +137,9 @@ router.get('/', [
     } = req.query;
 
     // Build comprehensive filter object
-    const filter = { isActive: isActive === 'true' };
+    const filter = { 
+      isActive: isActive === 'false' ? false : true // Default to true unless explicitly set to false
+    };
 
     // Category and subcategory filters
     if (category) filter.category = category;

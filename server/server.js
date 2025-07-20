@@ -69,6 +69,29 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Debug route for businesses
+app.get('/api/debug/businesses', async (req, res) => {
+  try {
+    const Business = (await import('./models/Business.js')).default;
+    const total = await Business.countDocuments();
+    const active = await Business.countDocuments({ isActive: true });
+    const sample = await Business.findOne();
+    
+    res.json({
+      debug: true,
+      counts: { total, active },
+      sampleBusiness: sample ? {
+        id: sample._id,
+        name: sample.name,
+        isActive: sample.isActive,
+        vendor: sample.vendor
+      } : null
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);

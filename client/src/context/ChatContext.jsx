@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback } from 'react';
 import { io } from 'socket.io-client';
+import chatService from '../services/chatService';
+import toast from 'react-hot-toast';
 
 // Chat Context
 const ChatContext = createContext();
@@ -351,18 +353,8 @@ export const ChatProvider = ({ children }) => {
     try {
       dispatch({ type: CHAT_ACTIONS.SET_LOADING, payload: true });
       
-      const token = localStorage.getItem('token');
-      const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
-      const response = await fetch(`${serverUrl}/api/chats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch({ type: CHAT_ACTIONS.SET_CHATS, payload: data.chats });
-      }
+      const data = await chatService.getChats();
+      dispatch({ type: CHAT_ACTIONS.SET_CHATS, payload: data.chats });
     } catch (error) {
       dispatch({ type: CHAT_ACTIONS.SET_ERROR, payload: error.message });
     } finally {
@@ -372,24 +364,14 @@ export const ChatProvider = ({ children }) => {
 
   const fetchMessages = useCallback(async (chatId) => {
     try {
-      const token = localStorage.getItem('token');
-      const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
-      const response = await fetch(`${serverUrl}/api/chats/${chatId}/messages`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const data = await chatService.getMessages(chatId);
+      dispatch({
+        type: CHAT_ACTIONS.SET_MESSAGES,
+        payload: {
+          chatId,
+          messages: data.messages
         }
       });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch({
-          type: CHAT_ACTIONS.SET_MESSAGES,
-          payload: {
-            chatId,
-            messages: data.messages
-          }
-        });
-      }
     } catch (error) {
       dispatch({ type: CHAT_ACTIONS.SET_ERROR, payload: error.message });
     }
@@ -397,22 +379,9 @@ export const ChatProvider = ({ children }) => {
 
   const startChat = useCallback(async (vendorId, businessId) => {
     try {
-      const token = localStorage.getItem('token');
-      const serverUrl = import.meta.env.VITE_SERVER_URL || 'http://localhost:5000';
-      const response = await fetch(`${serverUrl}/api/chats/start`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ vendorId, businessId })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        dispatch({ type: CHAT_ACTIONS.ADD_CHAT, payload: data.chat });
-        return data.chat;
-      }
+      const data = await chatService.startChat(vendorId, businessId);
+      dispatch({ type: CHAT_ACTIONS.ADD_CHAT, payload: data.chat });
+      return data.chat;
     } catch (error) {
       dispatch({ type: CHAT_ACTIONS.SET_ERROR, payload: error.message });
     }
@@ -424,6 +393,33 @@ export const ChatProvider = ({ children }) => {
 
   const setActiveChat = useCallback((chat) => {
     dispatch({ type: CHAT_ACTIONS.SET_ACTIVE_CHAT, payload: chat });
+  }, [dispatch]);
+
+  const markAsRead = useCallback(async (chatId) => {
+    try {
+      await chatService.markAsRead(chatId);
+      // Update local chat status
+      dispatch({
+        type: CHAT_ACTIONS.UPDATE_CHAT,
+        payload: { chatId, updates: { unreadCount: 0 } }
+      });
+    } catch (error) {
+      console.error('Failed to mark chat as read:', error.message);
+    }
+  }, [dispatch]);
+
+  const updateChatStatus = useCallback(async (chatId, status) => {
+    try {
+      const data = await chatService.updateChatStatus(chatId, status);
+      dispatch({
+        type: CHAT_ACTIONS.UPDATE_CHAT,
+        payload: { chatId, updates: { status } }
+      });
+      return data;
+    } catch (error) {
+      dispatch({ type: CHAT_ACTIONS.SET_ERROR, payload: error.message });
+      throw error;
+    }
   }, [dispatch]);
 
   // Cleanup on unmount
@@ -452,7 +448,10 @@ export const ChatProvider = ({ children }) => {
     fetchMessages,
     startChat,
     clearError,
-    setActiveChat
+    setActiveChat,
+    markAsRead,
+    updateChatStatus,
+    chatService // Make chatService available for direct use if needed
   };
 
   return (
