@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
@@ -20,6 +20,21 @@ import AdminDashboard from './pages/AdminDashboard';
 import Chat from './components/Chat/Chat';
 
 const queryClient = new QueryClient();
+
+// Component to conditionally render footer
+const ConditionalFooter = () => {
+  const location = useLocation();
+  
+  // Routes where footer should be hidden
+  const hideFooterRoutes = ['/login', '/register'];
+  
+  // Don't render footer on auth pages
+  if (hideFooterRoutes.includes(location.pathname)) {
+    return null;
+  }
+  
+  return <Footer />;
+};
 
 function App() {
   return (
@@ -47,7 +62,7 @@ function App() {
                     <Route path="/admin-dashboard" element={<AdminDashboard />} />
                   </Routes>
                 </main>
-                <Footer />
+                <ConditionalFooter />
                 <Toaster position="top-right" />
               </div>
             </Router>
