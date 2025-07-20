@@ -25,7 +25,7 @@ export const chatService = {
         throw new Error('Vendor ID and Business ID are required');
       }
 
-      const response = await api.post('/chats/start', {
+      const response = await api.post('/api/chats/start', {
         vendorId,
         businessId
       });
@@ -45,7 +45,7 @@ export const chatService = {
         throw new Error('Chat ID is required');
       }
 
-      const response = await api.get(`/chats/${chatId}`);
+      const response = await api.get(`/api/chats/${chatId}`);
       return response.data;
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -62,7 +62,7 @@ export const chatService = {
       }
 
       const { page = 1, limit = 50, before } = options;
-      const response = await api.get(`/chats/${chatId}/messages`, {
+      const response = await api.get(`/api/chats/${chatId}/messages`, {
         params: { page, limit, before }
       });
       
@@ -81,7 +81,7 @@ export const chatService = {
         throw new Error('Chat ID and message content are required');
       }
 
-      const response = await api.post(`/chats/${chatId}/messages`, {
+      const response = await api.post(`/api/chats/${chatId}/messages`, {
         content: content.trim(),
         messageType
       });
@@ -101,7 +101,7 @@ export const chatService = {
         throw new Error('Chat ID is required');
       }
 
-      const response = await api.put(`/chats/${chatId}/read`);
+      const response = await api.put(`/api/chats/${chatId}/read`);
       return response.data;
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -122,7 +122,7 @@ export const chatService = {
         throw new Error('Invalid status. Must be: active, archived, or closed');
       }
 
-      const response = await api.put(`/chats/${chatId}/status`, { status });
+      const response = await api.put(`/api/chats/${chatId}/status`, { status });
       
       toast.success(`Chat ${status} successfully`);
       return response.data;
@@ -140,7 +140,7 @@ export const chatService = {
         throw new Error('Message ID and content are required');
       }
 
-      const response = await api.put(`/chats/messages/${messageId}`, {
+      const response = await api.put(`/api/chats/messages/${messageId}`, {
         content: content.trim()
       });
       
@@ -160,7 +160,7 @@ export const chatService = {
         throw new Error('Message ID is required');
       }
 
-      const response = await api.delete(`/chats/messages/${messageId}`);
+      const response = await api.delete(`/api/chats/messages/${messageId}`);
       
       toast.success('Message deleted successfully');
       return response.data;
@@ -179,7 +179,7 @@ export const chatService = {
       }
 
       const { page = 1, limit = 20 } = options;
-      const response = await api.get('/chats/search', {
+      const response = await api.get('/api/chats/search', {
         params: { q: query.trim(), page, limit }
       });
       
@@ -194,7 +194,7 @@ export const chatService = {
   // Get online users (admin only)
   getOnlineUsers: async () => {
     try {
-      const response = await api.get('/chats/system/online-users');
+      const response = await api.get('/api/chats/system/online-users');
       return response.data;
     } catch (error) {
       const errorMessage = handleApiError(error);
@@ -214,7 +214,7 @@ export const chatService = {
       formData.append('file', file);
       formData.append('messageType', 'file');
 
-      const response = await api.post(`/chats/${chatId}/upload`, formData, {
+      const response = await api.post(`/api/chats/${chatId}/upload`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -240,7 +240,7 @@ export const chatService = {
   // Get chat statistics (for dashboard)
   getChatStats: async () => {
     try {
-      const response = await api.get('/chats/stats');
+      const response = await api.get('/api/chats/stats');
       return response.data;
     } catch (error) {
       const errorMessage = handleApiError(error);

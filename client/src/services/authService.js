@@ -5,7 +5,7 @@ export const authService = {
   // Register new user
   register: async (userData) => {
     try {
-      const response = await api.post('/api/auth/register', userData);
+      const response = await api.post('/auth/register', userData);
       
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -24,7 +24,7 @@ export const authService = {
   // Login user
   login: async (credentials) => {
     try {
-      const response = await api.post('/api/auth/login', credentials);
+      const response = await api.post('/auth/login', credentials);
       
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
@@ -43,7 +43,7 @@ export const authService = {
   // Logout user
   logout: async () => {
     try {
-      await api.post('/api/auth/logout');
+      await api.post('/auth/logout');
       toast.success('Logged out successfully');
     } catch (error) {
       console.error('Logout error:', error);
@@ -56,7 +56,7 @@ export const authService = {
   // Get current user
   getCurrentUser: async () => {
     try {
-      const response = await api.get('/api/auth/me');
+      const response = await api.get('/auth/me');
       
       // Update stored user data
       if (response.data.user) {
@@ -73,7 +73,7 @@ export const authService = {
   // Update user profile
   updateProfile: async (userData) => {
     try {
-      const response = await api.put('/api/auth/profile', userData);
+      const response = await api.put('/auth/profile', userData);
       
       if (response.data.user) {
         localStorage.setItem('user', JSON.stringify(response.data.user));
@@ -91,7 +91,7 @@ export const authService = {
   // Change password
   changePassword: async (passwordData) => {
     try {
-      const response = await api.put('/api/auth/change-password', passwordData);
+      const response = await api.put('/auth/change-password', passwordData);
       toast.success('Password changed successfully!');
       return response.data;
     } catch (error) {
@@ -104,7 +104,7 @@ export const authService = {
   // Request password reset
   requestPasswordReset: async (email) => {
     try {
-      const response = await api.post('/api/auth/forgot-password', { email });
+      const response = await api.post('/auth/forgot-password', { email });
       toast.success('Password reset email sent!');
       return response.data;
     } catch (error) {
@@ -117,7 +117,7 @@ export const authService = {
   // Reset password
   resetPassword: async (token, password) => {
     try {
-      const response = await api.post('/api/auth/reset-password', { token, password });
+      const response = await api.post('/auth/reset-password', { token, password });
       toast.success('Password reset successfully!');
       return response.data;
     } catch (error) {
@@ -130,7 +130,7 @@ export const authService = {
   // Verify email
   verifyEmail: async (token) => {
     try {
-      const response = await api.post('/api/auth/verify-email', { token });
+      const response = await api.post('/auth/verify-email', { token });
       toast.success('Email verified successfully!');
       return response.data;
     } catch (error) {
@@ -201,7 +201,7 @@ export const authService = {
   // Refresh token
   refreshToken: async () => {
     try {
-      const response = await api.post('/api/auth/refresh');
+      const response = await api.post('/auth/refresh');
       
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
