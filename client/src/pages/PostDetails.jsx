@@ -15,7 +15,8 @@ import {
   Share2,
   MoreVertical,
   Edit3,
-  Trash2
+  Trash2,
+  Send
 } from 'lucide-react';
 import { formatRelativeDate, capitalizeFirst } from '../utils/helpers';
 import toast from 'react-hot-toast';
@@ -29,6 +30,9 @@ const PostDetails = () => {
   const [error, setError] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(0);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState('');
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
 
   useEffect(() => {
     fetchPost();
@@ -41,7 +45,8 @@ const PostDetails = () => {
       if (response.success) {
         setPost(response.post);
         setLikesCount(response.post.likes?.length || 0);
-        setIsLiked(response.post.likes?.includes(user?._id) || false);
+        setIsLiked(response.post.likes?.some(like => like.user === user?._id) || false);
+        setComments(response.post.comments || []);
       } else {
         setError('Post not found');
       }
@@ -62,12 +67,43 @@ const PostDetails = () => {
     try {
       const response = await postService.likePost(id);
       if (response.success) {
-        setIsLiked(!isLiked);
-        setLikesCount(prev => isLiked ? prev - 1 : prev + 1);
-        toast.success(isLiked ? 'Post unliked' : 'Post liked');
+        setIsLiked(response.liked);
+        setLikesCount(response.likeCount);
+        toast.success(response.liked ? 'Post liked!' : 'Post unliked');
       }
     } catch (error) {
+      console.error('Like error:', error);
       toast.error('Failed to like post');
+    }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    
+    if (!user) {
+      toast.error('Please login to comment');
+      return;
+    }
+
+    if (!newComment.trim()) {
+      toast.error('Please enter a comment');
+      return;
+    }
+
+    try {
+      setIsSubmittingComment(true);
+      const response = await postService.addComment(id, newComment.trim());
+      
+      if (response.success) {
+        setComments(response.comments);
+        setNewComment('');
+        toast.success('Comment added successfully!');
+      }
+    } catch (error) {
+      console.error('Comment error:', error);
+      toast.error('Failed to add comment');
+    } finally {
+      setIsSubmittingComment(false);
     }
   };
 
@@ -231,7 +267,7 @@ const PostDetails = () => {
                 
                 <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg">
                   <MessageCircle className="w-5 h-5" />
-                  <span>{post.comments?.length || 0} {post.comments?.length === 1 ? 'comment' : 'comments'}</span>
+                  <span>{comments?.length || 0} {comments?.length === 1 ? 'comment' : 'comments'}</span>
                 </div>
                 
                 <div className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg">
@@ -251,16 +287,108 @@ const PostDetails = () => {
           </div>
         </article>
 
-        {/* Comments Section Placeholder */}
-        <div className="mt-8 bg-white/70 backdrop-blur-md rounded-2xl p-8 shadow-xl border border-white/20">
-          <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center space-x-2">
-            <MessageCircle className="w-6 h-6" />
-            <span>Comments</span>
-          </h3>
-          <div className="text-center py-12 text-gray-500">
-            <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-            <p>Comments feature coming soon!</p>
-            <p className="text-sm">Join the conversation when this feature is available.</p>
+        {/* Comments Section */}
+        <div className="mt-8 bg-white/70 backdrop-blur-md rounded-2xl shadow-xl border border-white/20 overflow-hidden">
+          <div className="p-8 border-b border-gray-200/50">
+            <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center space-x-2">
+              <MessageCircle className="w-6 h-6" />
+              <span>Comments ({comments?.length || 0})</span>
+            </h3>
+
+            {/* Add Comment Form */}
+            {user ? (
+              <form onSubmit={handleAddComment} className="mb-6">
+                <div className="flex space-x-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+                      {user.firstName?.charAt(0) || user.username?.charAt(0) || 'U'}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="relative">
+                      <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        placeholder="Add a comment..."
+                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+                        rows="3"
+                        maxLength="500"
+                      />
+                      <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                        {newComment.length}/500
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center mt-3">
+                      <div className="text-sm text-gray-500">
+                        Posting as {user.firstName ? `${user.firstName} ${user.lastName}` : user.username}
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={!newComment.trim() || isSubmittingComment}
+                        className="inline-flex items-center space-x-2 px-6 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:from-gray-400 disabled:to-gray-400 text-white rounded-lg font-medium transition-all duration-200 disabled:cursor-not-allowed"
+                      >
+                        {isSubmittingComment ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                            <span>Posting...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            <span>Post Comment</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p className="text-blue-800 text-center">
+                  <Link to="/login" className="font-medium hover:underline">
+                    Sign in
+                  </Link> to join the conversation
+                </p>
+              </div>
+            )}
+
+            {/* Comments List */}
+            <div className="space-y-6">
+              {comments && comments.length > 0 ? (
+                comments.map((comment) => (
+                  <div key={comment._id} className="flex space-x-4 p-4 bg-gray-50/50 rounded-xl">
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-semibold">
+                        {comment.user?.firstName?.charAt(0) || comment.user?.username?.charAt(0) || 'U'}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center space-x-2 mb-1">
+                        <span className="font-medium text-gray-900">
+                          {comment.user?.firstName ? 
+                            `${comment.user.firstName} ${comment.user.lastName}` : 
+                            comment.user?.username || 'Anonymous'
+                          }
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {formatRelativeDate(comment.createdAt)}
+                        </span>
+                      </div>
+                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {comment.text}
+                      </p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-12 text-gray-500">
+                  <MessageCircle className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                  <p className="font-medium">No comments yet</p>
+                  <p className="text-sm">Be the first to share your thoughts!</p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
