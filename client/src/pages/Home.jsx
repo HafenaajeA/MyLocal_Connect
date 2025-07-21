@@ -9,10 +9,13 @@ import { Building2, Star, MapPin, ArrowRight, ChevronLeft, ChevronRight, Users, 
 
 const Home = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [postsPerPage, setPostsPerPage] = useState(3); // Start with 3 posts
   const [filters, setFilters] = useState({
     category: 'all',
     search: '',
-    page: 1
+    page: 1,
+    limit: 3, // Start with 3 posts per page
+    sortBy: 'newest'
   });
 
   // Hero slider images and content
@@ -81,8 +84,10 @@ const Home = () => {
     setFilters(prev => ({
       ...prev,
       [key]: value,
-      page: 1 // Reset page when filters change
+      page: 1, // Reset page when filters change
+      limit: 3 // Reset to 3 posts when filters change
     }));
+    setPostsPerPage(3); // Reset posts per page
   };
 
   const handlePageChange = (newPage) => {
@@ -90,6 +95,30 @@ const Home = () => {
       ...prev,
       page: newPage
     }));
+    // Scroll to posts section
+    document.getElementById('posts-section')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleLoadMore = () => {
+    const newLimit = Math.min(postsPerPage + 3, 15); // Increase by 3, max 15
+    setPostsPerPage(newLimit);
+    setFilters(prev => ({
+      ...prev,
+      limit: newLimit
+    }));
+  };
+
+  const handleShowLess = () => {
+    const newLimit = Math.max(postsPerPage - 3, 3); // Decrease by 3, min 3
+    setPostsPerPage(newLimit);
+    setFilters(prev => ({
+      ...prev,
+      limit: newLimit
+    }));
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Remove the early return for loading and error - let the component render
@@ -346,7 +375,7 @@ const Home = () => {
       </div>
 
       {/* Recent Posts Preview */}
-      <div className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
+      <div id="posts-section" className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
@@ -355,6 +384,41 @@ const Home = () => {
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
               Stay connected with what's happening in your neighborhood
             </p>
+            
+            {/* Enhanced Search Bar */}
+            <div className="max-w-2xl mx-auto mb-8">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Search posts by title, content, author, or tags..."
+                  value={filters.search}
+                  onChange={(e) => handleFilterChange('search', e.target.value)}
+                  className="w-full pl-12 pr-12 py-4 bg-white/70 backdrop-blur-sm border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-gray-700 placeholder-gray-500 text-lg"
+                />
+                <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                {filters.search && (
+                  <button
+                    onClick={() => handleFilterChange('search', '')}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+              </div>
+              {filters.search && (
+                <div className="mt-3 text-center">
+                  <span className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-800">
+                    Searching for: "{filters.search}"
+                  </span>
+                </div>
+              )}
+            </div>
             
             {/* Quick Filters */}
             <div className="flex flex-wrap justify-center gap-4 mb-8">
@@ -372,7 +436,49 @@ const Home = () => {
                 </button>
               ))}
             </div>
+
+            {/* Sort Options */}
+            <div className="flex flex-wrap justify-center items-center gap-4 mb-8">
+              <span className="text-gray-600 font-medium">Sort by:</span>
+              {[
+                { key: 'newest', label: 'Newest First' },
+                { key: 'oldest', label: 'Oldest First' },
+                { key: 'popular', label: 'Most Popular' },
+                { key: 'commented', label: 'Most Commented' }
+              ].map((option) => (
+                <button
+                  key={option.key}
+                  onClick={() => handleFilterChange('sortBy', option.key)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all duration-300 text-sm ${
+                    filters.sortBy === option.key
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md'
+                      : 'bg-white/70 backdrop-blur-sm text-gray-600 hover:bg-white hover:shadow-sm'
+                  }`}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Results Count and Posts Per Page Info */}
+          {!isLoading && data?.pagination && (
+            <div className="text-center mb-8">
+              <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-4">
+                <div className="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm px-6 py-3 rounded-full text-gray-700">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="font-medium">
+                    {data.pagination.total} {data.pagination.total === 1 ? 'post' : 'posts'} found
+                    {filters.search && ` for "${filters.search}"`}
+                    {filters.category !== 'all' && ` in ${filters.category}`}
+                  </span>
+                </div>
+                <div className="inline-flex items-center space-x-2 bg-blue-50 backdrop-blur-sm px-4 py-2 rounded-full text-blue-700 text-sm">
+                  <span>Showing {postsPerPage} posts per page</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Posts Grid */}
           {isLoading ? (
@@ -395,11 +501,140 @@ const Home = () => {
               </div>
             </div>
           ) : data?.posts?.length > 0 ? (
-            <div className="grid gap-6 mb-12">
-              {data.posts.slice(0, 3).map(post => (
-                <PostCard key={post._id} post={post} />
-              ))}
-            </div>
+            <>
+              <div className="grid gap-6 mb-12">
+                {data.posts.map(post => (
+                  <PostCard key={post._id} post={post} />
+                ))}
+              </div>
+
+              {/* New Pagination System */}
+              {data.pagination && (
+                <div className="flex flex-col items-center space-y-6">
+                  {/* Load More/Show Less Controls */}
+                  <div className="flex items-center space-x-4">
+                    {postsPerPage > 3 && (
+                      <button
+                        onClick={handleShowLess}
+                        className="inline-flex items-center space-x-2 px-6 py-3 bg-white/70 backdrop-blur-sm border border-gray-200 text-gray-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white hover:border-transparent rounded-full font-medium transition-all duration-300 transform hover:scale-105"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                        </svg>
+                        <span>Show Less</span>
+                      </button>
+                    )}
+                    
+                    {postsPerPage < 15 && data.posts.length === postsPerPage && data.pagination.total > postsPerPage && (
+                      <button
+                        onClick={handleLoadMore}
+                        className="inline-flex items-center space-x-2 px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                        <span>Load More Posts ({Math.min(3, Math.min(15, data.pagination.total) - postsPerPage)} more)</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Page Navigation (only show if more than current limit) */}
+                  {data.pagination.total > postsPerPage && (
+                    <div className="flex flex-col items-center space-y-4">
+                      <div className="text-sm text-gray-600 bg-white/70 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Page {data.pagination.current} of {Math.ceil(data.pagination.total / postsPerPage)}
+                      </div>
+
+                      {/* Numbered Pagination */}
+                      {Math.ceil(data.pagination.total / postsPerPage) > 1 && (
+                        <div className="flex items-center space-x-2">
+                          {/* Previous Button */}
+                          <button
+                            onClick={() => handlePageChange(data.pagination.current - 1)}
+                            disabled={data.pagination.current === 1}
+                            className={`flex items-center space-x-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                              data.pagination.current === 1
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transform hover:scale-105'
+                            }`}
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                            <span className="hidden sm:inline">Prev</span>
+                          </button>
+
+                          {/* Page Numbers */}
+                          <div className="flex items-center space-x-1">
+                            {(() => {
+                              const current = data.pagination.current;
+                              const totalPages = Math.ceil(data.pagination.total / postsPerPage);
+                              const pages = [];
+                              
+                              // Show max 5 page numbers
+                              let startPage = Math.max(1, current - 2);
+                              let endPage = Math.min(totalPages, current + 2);
+                              
+                              // Adjust if we're near the beginning or end
+                              if (endPage - startPage < 4) {
+                                if (startPage === 1) {
+                                  endPage = Math.min(totalPages, startPage + 4);
+                                } else if (endPage === totalPages) {
+                                  startPage = Math.max(1, endPage - 4);
+                                }
+                              }
+                              
+                              for (let i = startPage; i <= endPage; i++) {
+                                pages.push(i);
+                              }
+                              
+                              return pages.map((page) => (
+                                <button
+                                  key={page}
+                                  onClick={() => handlePageChange(page)}
+                                  className={`w-10 h-10 rounded-lg font-medium transition-all duration-200 ${
+                                    page === current
+                                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg transform scale-110'
+                                      : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-100 hover:to-purple-100 hover:text-blue-700 transform hover:scale-105'
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              ));
+                            })()}
+                          </div>
+
+                          {/* Next Button */}
+                          <button
+                            onClick={() => handlePageChange(data.pagination.current + 1)}
+                            disabled={data.pagination.current >= Math.ceil(data.pagination.total / postsPerPage)}
+                            className={`flex items-center space-x-1 px-3 py-2 rounded-lg font-medium transition-all duration-200 ${
+                              data.pagination.current >= Math.ceil(data.pagination.total / postsPerPage)
+                                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                : 'bg-white/70 backdrop-blur-sm text-gray-700 hover:bg-gradient-to-r hover:from-blue-600 hover:to-purple-600 hover:text-white transform hover:scale-105'
+                            }`}
+                          >
+                            <span className="hidden sm:inline">Next</span>
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Back to Top Button */}
+                  {data.pagination.current > 1 && (
+                    <button
+                      onClick={scrollToTop}
+                      className="flex items-center space-x-2 px-4 py-2 bg-white/70 backdrop-blur-sm text-gray-600 hover:text-blue-600 rounded-lg transition-all duration-200 transform hover:scale-105"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                      </svg>
+                      <span>Back to Top</span>
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-16">
               <div className="bg-white/70 backdrop-blur-sm rounded-3xl p-12 max-w-md mx-auto">
@@ -414,18 +649,6 @@ const Home = () => {
                   Create First Post
                 </Link>
               </div>
-            </div>
-          )}
-
-          {/* Show "View More" only if there are posts and more than 3 */}
-          {data?.posts?.length > 3 && (
-            <div className="text-center">
-              <Link
-                to="/create-post"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold transition-all duration-300 transform hover:scale-105"
-              >
-                Create Your Own Post <ArrowRight className="w-5 h-5" />
-              </Link>
             </div>
           )}
         </div>

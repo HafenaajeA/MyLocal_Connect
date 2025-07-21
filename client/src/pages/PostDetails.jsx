@@ -37,6 +37,15 @@ const PostDetails = () => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editingCommentText, setEditingCommentText] = useState('');
   const [commentLikingId, setCommentLikingId] = useState(null);
+  const [isEditingPost, setIsEditingPost] = useState(false);
+  const [editPostData, setEditPostData] = useState({
+    title: '',
+    content: '',
+    category: '',
+    tags: [],
+    location: ''
+  });
+  const [isDeletingPost, setIsDeletingPost] = useState(false);
 
   useEffect(() => {
     fetchPost();
@@ -228,6 +237,69 @@ const PostDetails = () => {
     }
   };
 
+  const handleEditPost = () => {
+    setEditPostData({
+      title: post.title,
+      content: post.content,
+      category: post.category,
+      tags: post.tags || [],
+      location: post.location || ''
+    });
+    setIsEditingPost(true);
+  };
+
+  const handleSavePost = async () => {
+    if (!editPostData.title.trim() || !editPostData.content.trim()) {
+      toast.error('Title and content are required');
+      return;
+    }
+
+    try {
+      const response = await postService.updatePost(id, editPostData);
+      
+      if (response.success) {
+        setPost(response.post);
+        setIsEditingPost(false);
+        toast.success('Post updated successfully!');
+      }
+    } catch (error) {
+      console.error('Update post error:', error);
+      toast.error('Failed to update post');
+    }
+  };
+
+  const handleCancelEditPost = () => {
+    setIsEditingPost(false);
+    setEditPostData({
+      title: '',
+      content: '',
+      category: '',
+      tags: [],
+      location: ''
+    });
+  };
+
+  const handleDeletePost = async () => {
+    if (!window.confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setIsDeletingPost(true);
+      const response = await postService.deletePost(id);
+      
+      if (response.success) {
+        toast.success('Post deleted successfully!');
+        navigate('/');
+      }
+    } catch (error) {
+      console.error('Delete post error:', error);
+      toast.error('Failed to delete post');
+    } finally {
+      setIsDeletingPost(false);
+    }
+  };
+
   const handleShare = async () => {
     if (navigator.share) {
       try {
@@ -332,42 +404,159 @@ const PostDetails = () => {
                   {capitalizeFirst(post.category)}
                 </span>
                 {user && user._id === post.author?._id && (
-                  <div className="relative">
-                    <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                      <MoreVertical className="w-5 h-5" />
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={handleEditPost}
+                      disabled={isEditingPost}
+                      className="p-2 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
+                      title="Edit post"
+                    >
+                      <Edit3 className="w-5 h-5" />
+                    </button>
+                    <button
+                      onClick={handleDeletePost}
+                      disabled={isDeletingPost}
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                      title="Delete post"
+                    >
+                      {isDeletingPost ? (
+                        <div className="w-5 h-5 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                      ) : (
+                        <Trash2 className="w-5 h-5" />
+                      )}
                     </button>
                   </div>
                 )}
               </div>
             </div>
 
-            <h1 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
-              {post.title}
-            </h1>
+            {isEditingPost ? (
+              <div className="space-y-4">
+                {/* Edit Title */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                  <input
+                    type="text"
+                    value={editPostData.title}
+                    onChange={(e) => setEditPostData(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Post title"
+                    maxLength="200"
+                  />
+                </div>
 
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mb-4">
-                {post.tags.map((tag, index) => (
-                  <span 
-                    key={index}
-                    className="inline-flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                {/* Edit Category */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                  <select
+                    value={editPostData.category}
+                    onChange={(e) => setEditPostData(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
-                    <Tag className="w-3 h-3" />
-                    <span>{tag}</span>
-                  </span>
-                ))}
+                    <option value="general">General</option>
+                    <option value="events">Events</option>
+                    <option value="business">Business</option>
+                    <option value="services">Services</option>
+                    <option value="community">Community</option>
+                    <option value="news">News</option>
+                  </select>
+                </div>
+
+                {/* Edit Location */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Location (optional)</label>
+                  <input
+                    type="text"
+                    value={editPostData.location}
+                    onChange={(e) => setEditPostData(prev => ({ ...prev, location: e.target.value }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="Location"
+                    maxLength="100"
+                  />
+                </div>
+
+                {/* Edit Tags */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tags (comma-separated)</label>
+                  <input
+                    type="text"
+                    value={editPostData.tags.join(', ')}
+                    onChange={(e) => setEditPostData(prev => ({ 
+                      ...prev, 
+                      tags: e.target.value.split(',').map(tag => tag.trim()).filter(tag => tag) 
+                    }))}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    placeholder="tag1, tag2, tag3"
+                  />
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex justify-end space-x-3 pt-4">
+                  <button
+                    onClick={handleCancelEditPost}
+                    className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSavePost}
+                    disabled={!editPostData.title.trim() || !editPostData.content.trim()}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                  >
+                    Save Changes
+                  </button>
+                </div>
               </div>
+            ) : (
+              <>
+                <h1 className="text-3xl font-bold text-gray-800 mb-4 leading-tight">
+                  {post.title}
+                </h1>
+
+                {/* Tags */}
+                {post.tags && post.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {post.tags.map((tag, index) => (
+                      <span 
+                        key={index}
+                        className="inline-flex items-center space-x-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                      >
+                        <Tag className="w-3 h-3" />
+                        <span>{tag}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </>
             )}
           </div>
 
           {/* Post Body */}
           <div className="p-8">
-            <div className="prose prose-lg max-w-none">
-              <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                {post.content}
-              </p>
-            </div>
+            {isEditingPost ? (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content</label>
+                <div className="relative">
+                  <textarea
+                    value={editPostData.content}
+                    onChange={(e) => setEditPostData(prev => ({ ...prev, content: e.target.value }))}
+                    className="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    rows="10"
+                    placeholder="What's on your mind?"
+                    maxLength="2000"
+                  />
+                  <div className="absolute bottom-3 right-3 text-xs text-gray-400">
+                    {editPostData.content.length}/2000
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="prose prose-lg max-w-none">
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  {post.content}
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Post Footer */}
