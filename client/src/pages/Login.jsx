@@ -24,7 +24,7 @@ const Login = () => {
       const result = await login(data);
       
       if (result.success) {
-        toast.success('Welcome back!');
+        // toast.success('Welcome back!'); // Toast is already used by authService
         navigate('/');
       } else {
         toast.error(result.message || 'Login failed');

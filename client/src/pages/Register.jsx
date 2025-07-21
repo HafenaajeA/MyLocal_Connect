@@ -28,7 +28,7 @@ const Register = () => {
       const result = await registerUser(data);
       
       if (result.success) {
-        toast.success('Account created successfully! Welcome to MyLocal Connect!');
+        //toast.success('Account created successfully! Welcome to MyLocal Connect!'); // Toast is already used by authService
         navigate('/');
       } else {
         toast.error(result.message || 'Registration failed');
