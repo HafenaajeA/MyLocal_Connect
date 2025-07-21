@@ -501,40 +501,6 @@ const PostDetails = () => {
                             {formatRelativeDate(comment.createdAt)}
                           </span>
                         </div>
-                        {(() => {
-                          if (!user) return null;
-                          
-                          const userId = user._id || user.id;
-                          const commentUserId = comment.user?._id || comment.user?.id;
-                          console.log('User ID:', userId, 'Comment User ID:', commentUserId, 'Match:', userId === commentUserId);
-                          
-                          const canModify = userId === commentUserId;
-                          
-                          return canModify ? (
-                            <div className="flex items-center space-x-2">
-                              <button
-                                onClick={() => handleEditComment(comment._id, comment.text)}
-                                disabled={editingCommentId === comment._id}
-                                className="p-1 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
-                                title="Edit comment"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteComment(comment._id)}
-                                disabled={deletingCommentId === comment._id}
-                                className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
-                                title="Delete comment"
-                              >
-                                {deletingCommentId === comment._id ? (
-                                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  <Trash2 className="w-4 h-4" />
-                                )}
-                              </button>
-                            </div>
-                          ) : null;
-                        })()}
                       </div>
                       {editingCommentId === comment._id ? (
                         <div className="mt-2">
@@ -579,31 +545,14 @@ const PostDetails = () => {
                           
                           {/* Comment Actions */}
                           <div className="flex items-center justify-between mt-3">
-                            <button
-                              onClick={() => handleCommentLike(comment._id)}
-                              disabled={commentLikingId === comment._id}
-                              className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-sm transition-all duration-200 ${
-                                (() => {
-                                  if (!user) return 'text-gray-500 hover:text-gray-600';
-                                  
-                                  const userId = user._id || user.id;
-                                  const isLiked = comment.likes?.some(like => {
-                                    const likeUserId = like.user?._id || like.user?.id || like.user;
-                                    return likeUserId === userId;
-                                  });
-                                  
-                                  return isLiked 
-                                    ? 'text-red-600 bg-red-50 hover:bg-red-100' 
-                                    : 'text-gray-500 hover:text-red-600 hover:bg-red-50';
-                                })()
-                              }`}
-                            >
-                              {commentLikingId === comment._id ? (
-                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <Heart className={`w-4 h-4 ${
+                            <div className="flex items-center space-x-2">
+                              {/* Like Button */}
+                              <button
+                                onClick={() => handleCommentLike(comment._id)}
+                                disabled={commentLikingId === comment._id}
+                                className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-sm transition-all duration-200 ${
                                   (() => {
-                                    if (!user) return '';
+                                    if (!user) return 'text-gray-500 hover:text-gray-600';
                                     
                                     const userId = user._id || user.id;
                                     const isLiked = comment.likes?.some(like => {
@@ -611,12 +560,66 @@ const PostDetails = () => {
                                       return likeUserId === userId;
                                     });
                                     
-                                    return isLiked ? 'fill-current' : '';
+                                    return isLiked 
+                                      ? 'text-red-600 bg-red-50 hover:bg-red-100' 
+                                      : 'text-gray-500 hover:text-red-600 hover:bg-red-50';
                                   })()
-                                }`} />
-                              )}
-                              <span>{comment.likes?.length || 0}</span>
-                            </button>
+                                }`}
+                              >
+                                {commentLikingId === comment._id ? (
+                                  <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Heart className={`w-4 h-4 ${
+                                    (() => {
+                                      if (!user) return '';
+                                      
+                                      const userId = user._id || user.id;
+                                      const isLiked = comment.likes?.some(like => {
+                                        const likeUserId = like.user?._id || like.user?.id || like.user;
+                                        return likeUserId === userId;
+                                      });
+                                      
+                                      return isLiked ? 'fill-current' : '';
+                                    })()
+                                  }`} />
+                                )}
+                                <span>{comment.likes?.length || 0}</span>
+                              </button>
+
+                              {/* Edit and Delete Buttons (only for comment owner) */}
+                              {(() => {
+                                if (!user) return null;
+                                
+                                const userId = user._id || user.id;
+                                const commentUserId = comment.user?._id || comment.user?.id;
+                                const canModify = userId === commentUserId;
+                                
+                                return canModify ? (
+                                  <>
+                                    <button
+                                      onClick={() => handleEditComment(comment._id, comment.text)}
+                                      disabled={editingCommentId === comment._id}
+                                      className="p-1 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
+                                      title="Edit comment"
+                                    >
+                                      <Edit3 className="w-4 h-4" />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteComment(comment._id)}
+                                      disabled={deletingCommentId === comment._id}
+                                      className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                                      title="Delete comment"
+                                    >
+                                      {deletingCommentId === comment._id ? (
+                                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                                      ) : (
+                                        <Trash2 className="w-4 h-4" />
+                                      )}
+                                    </button>
+                                  </>
+                                ) : null;
+                              })()}
+                            </div>
                           </div>
                         </div>
                       )}
