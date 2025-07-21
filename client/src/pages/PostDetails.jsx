@@ -34,6 +34,9 @@ const PostDetails = () => {
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
+  const [editingCommentId, setEditingCommentId] = useState(null);
+  const [editingCommentText, setEditingCommentText] = useState('');
+  const [commentLikingId, setCommentLikingId] = useState(null);
 
   useEffect(() => {
     fetchPost();
@@ -141,6 +144,87 @@ const PostDetails = () => {
       toast.error('Failed to delete comment');
     } finally {
       setDeletingCommentId(null);
+    }
+  };
+
+  const handleEditComment = (commentId, currentText) => {
+    setEditingCommentId(commentId);
+    setEditingCommentText(currentText);
+  };
+
+  const handleSaveEditComment = async (commentId) => {
+    if (!user) {
+      toast.error('Please login to edit comments');
+      return;
+    }
+
+    if (!editingCommentText.trim()) {
+      toast.error('Please enter comment text');
+      return;
+    }
+
+    try {
+      const response = await postService.editComment(id, commentId, editingCommentText.trim());
+      
+      if (response.success) {
+        setComments(response.comments);
+        setEditingCommentId(null);
+        setEditingCommentText('');
+        toast.success('Comment updated successfully!');
+      }
+    } catch (error) {
+      console.error('Edit comment error:', error);
+      toast.error('Failed to edit comment');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingCommentId(null);
+    setEditingCommentText('');
+  };
+
+  const handleCommentLike = async (commentId) => {
+    if (!user) {
+      toast.error('Please login to like comments');
+      return;
+    }
+
+    try {
+      setCommentLikingId(commentId);
+      const response = await postService.toggleCommentLike(id, commentId);
+      
+      if (response.success) {
+        // Update the comment in the local state
+        setComments(prevComments => 
+          prevComments.map(comment => {
+            if (comment._id === commentId) {
+              const userId = user._id || user.id;
+              const isCurrentlyLiked = comment.likes?.some(like => {
+                const likeUserId = like.user?._id || like.user?.id || like.user;
+                return likeUserId === userId;
+              });
+              
+              return {
+                ...comment,
+                likes: response.liked 
+                  ? [...(comment.likes || []), { user: userId, createdAt: new Date() }]
+                  : (comment.likes || []).filter(like => {
+                      const likeUserId = like.user?._id || like.user?.id || like.user;
+                      return likeUserId !== userId;
+                    })
+              };
+            }
+            return comment;
+          })
+        );
+        
+        toast.success(response.liked ? 'Comment liked!' : 'Comment unliked');
+      }
+    } catch (error) {
+      console.error('Comment like error:', error);
+      toast.error('Failed to like comment');
+    } finally {
+      setCommentLikingId(null);
     }
   };
 
@@ -424,27 +508,118 @@ const PostDetails = () => {
                           const commentUserId = comment.user?._id || comment.user?.id;
                           console.log('User ID:', userId, 'Comment User ID:', commentUserId, 'Match:', userId === commentUserId);
                           
-                          const canDelete = userId === commentUserId;
+                          const canModify = userId === commentUserId;
                           
-                          return canDelete ? (
-                            <button
-                              onClick={() => handleDeleteComment(comment._id)}
-                              disabled={deletingCommentId === comment._id}
-                              className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
-                              title="Delete comment"
-                            >
-                              {deletingCommentId === comment._id ? (
-                                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
-                              ) : (
-                                <Trash2 className="w-4 h-4" />
-                              )}
-                            </button>
+                          return canModify ? (
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => handleEditComment(comment._id, comment.text)}
+                                disabled={editingCommentId === comment._id}
+                                className="p-1 text-gray-400 hover:text-blue-500 transition-colors rounded-lg hover:bg-blue-50"
+                                title="Edit comment"
+                              >
+                                <Edit3 className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteComment(comment._id)}
+                                disabled={deletingCommentId === comment._id}
+                                className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                                title="Delete comment"
+                              >
+                                {deletingCommentId === comment._id ? (
+                                  <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                                ) : (
+                                  <Trash2 className="w-4 h-4" />
+                                )}
+                              </button>
+                            </div>
                           ) : null;
                         })()}
                       </div>
-                      <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
-                        {comment.text}
-                      </p>
+                      {editingCommentId === comment._id ? (
+                        <div className="mt-2">
+                          <div className="relative">
+                            <textarea
+                              value={editingCommentText}
+                              onChange={(e) => setEditingCommentText(e.target.value)}
+                              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-all duration-200"
+                              rows="3"
+                              maxLength="500"
+                            />
+                            <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+                              {editingCommentText.length}/500
+                            </div>
+                          </div>
+                          <div className="flex justify-end space-x-2 mt-2">
+                            <button
+                              onClick={handleCancelEdit}
+                              className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              onClick={() => handleSaveEditComment(comment._id)}
+                              disabled={!editingCommentText.trim()}
+                              className="px-4 py-1 text-sm bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white rounded-lg transition-colors disabled:cursor-not-allowed"
+                            >
+                              Save
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div>
+                          <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                            {comment.text}
+                          </p>
+                          {comment.updatedAt && comment.updatedAt !== comment.createdAt && (
+                            <p className="text-xs text-gray-400 mt-1">
+                              (edited)
+                            </p>
+                          )}
+                          
+                          {/* Comment Actions */}
+                          <div className="flex items-center justify-between mt-3">
+                            <button
+                              onClick={() => handleCommentLike(comment._id)}
+                              disabled={commentLikingId === comment._id}
+                              className={`flex items-center space-x-1 px-2 py-1 rounded-lg text-sm transition-all duration-200 ${
+                                (() => {
+                                  if (!user) return 'text-gray-500 hover:text-gray-600';
+                                  
+                                  const userId = user._id || user.id;
+                                  const isLiked = comment.likes?.some(like => {
+                                    const likeUserId = like.user?._id || like.user?.id || like.user;
+                                    return likeUserId === userId;
+                                  });
+                                  
+                                  return isLiked 
+                                    ? 'text-red-600 bg-red-50 hover:bg-red-100' 
+                                    : 'text-gray-500 hover:text-red-600 hover:bg-red-50';
+                                })()
+                              }`}
+                            >
+                              {commentLikingId === comment._id ? (
+                                <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Heart className={`w-4 h-4 ${
+                                  (() => {
+                                    if (!user) return '';
+                                    
+                                    const userId = user._id || user.id;
+                                    const isLiked = comment.likes?.some(like => {
+                                      const likeUserId = like.user?._id || like.user?.id || like.user;
+                                      return likeUserId === userId;
+                                    });
+                                    
+                                    return isLiked ? 'fill-current' : '';
+                                  })()
+                                }`} />
+                              )}
+                              <span>{comment.likes?.length || 0}</span>
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))

@@ -59,5 +59,17 @@ export const postService = {
   deleteComment: async (postId, commentId) => {
     const response = await api.delete(`/posts/${postId}/comment/${commentId}`);
     return response.data;
+  },
+
+  // Edit comment on post
+  editComment: async (postId, commentId, text) => {
+    const response = await api.put(`/posts/${postId}/comment/${commentId}`, { text });
+    return response.data;
+  },
+
+  // Like/Unlike comment
+  toggleCommentLike: async (postId, commentId) => {
+    const response = await api.post(`/posts/${postId}/comment/${commentId}/like`);
+    return response.data;
   }
 };

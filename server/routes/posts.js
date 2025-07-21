@@ -389,4 +389,132 @@ router.delete('/:id/comment/:commentId', authMiddleware, async (req, res) => {
   }
 });
 
+// @route   PUT /api/posts/:id/comment/:commentId
+// @desc    Edit a comment on a post
+// @access  Private
+router.put('/:id/comment/:commentId', authMiddleware, [
+  body('text').notEmpty().trim().withMessage('Comment text is required')
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Validation errors',
+        errors: errors.array()
+      });
+    }
+
+    const post = await Post.findById(req.params.id);
+
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    const comment = post.comments.id(req.params.commentId);
+    
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Comment not found'
+      });
+    }
+
+    // Check if user owns the comment or is admin
+    const commentUserId = comment.user.toString();
+    const requestUserId = req.user.id.toString();
+    
+    if (commentUserId !== requestUserId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Insufficient permissions.'
+      });
+    }
+
+    // Update comment
+    comment.text = req.body.text;
+    comment.updatedAt = new Date();
+    await post.save();
+    
+    await post.populate('comments.user', 'username firstName lastName avatar');
+
+    res.json({
+      success: true,
+      message: 'Comment updated successfully',
+      comments: post.comments
+    });
+  } catch (error) {
+    console.error('Edit comment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
+// @route   POST /api/posts/:id/comment/:commentId/like
+// @desc    Like/Unlike a comment
+// @access  Private
+router.post('/:id/comment/:commentId/like', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    const comment = post.comments.id(req.params.commentId);
+    
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Comment not found'
+      });
+    }
+
+    const userId = req.user.id;
+    const existingLike = comment.likes.find(like => like.user.toString() === userId);
+
+    if (existingLike) {
+      // Unlike comment
+      await post.unlikeComment(req.params.commentId, userId);
+      // Get updated comment to return correct count
+      const updatedPost = await Post.findById(req.params.id);
+      const updatedComment = updatedPost.comments.id(req.params.commentId);
+      
+      res.json({
+        success: true,
+        message: 'Comment unliked',
+        liked: false,
+        likeCount: updatedComment.likes.length
+      });
+    } else {
+      // Like comment
+      await post.likeComment(req.params.commentId, userId);
+      // Get updated comment to return correct count
+      const updatedPost = await Post.findById(req.params.id);
+      const updatedComment = updatedPost.comments.id(req.params.commentId);
+      
+      res.json({
+        success: true,
+        message: 'Comment liked',
+        liked: true,
+        likeCount: updatedComment.likes.length
+      });
+    }
+  } catch (error) {
+    console.error('Like comment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 export default router;

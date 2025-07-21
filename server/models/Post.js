@@ -57,9 +57,22 @@ const postSchema = new mongoose.Schema({
       required: [true, 'Comment text is required'],
       maxlength: [500, 'Comment cannot exceed 500 characters']
     },
+    likes: [{
+      user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now
+      }
+    }],
     createdAt: {
       type: Date,
       default: Date.now
+    },
+    updatedAt: {
+      type: Date
     }
   }],
   isActive: {
@@ -107,6 +120,27 @@ postSchema.methods.removeLike = function(userId) {
 // Method to add a comment
 postSchema.methods.addComment = function(userId, text) {
   this.comments.push({ user: userId, text });
+  return this.save();
+};
+
+// Method to like a comment
+postSchema.methods.likeComment = function(commentId, userId) {
+  const comment = this.comments.id(commentId);
+  if (comment) {
+    const existingLike = comment.likes.find(like => like.user.toString() === userId.toString());
+    if (!existingLike) {
+      comment.likes.push({ user: userId });
+    }
+  }
+  return this.save();
+};
+
+// Method to unlike a comment
+postSchema.methods.unlikeComment = function(commentId, userId) {
+  const comment = this.comments.id(commentId);
+  if (comment) {
+    comment.likes = comment.likes.filter(like => like.user.toString() !== userId.toString());
+  }
   return this.save();
 };
 
