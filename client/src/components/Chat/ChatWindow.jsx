@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Send, User, Building2, Paperclip, Check, CheckCheck } from 'lucide-react';
 import { useChat } from '../../context/ChatContext';
+import LoadingSpinner from '../LoadingSpinner';
 
 
 const ChatWindow = ({ chat }) => {
@@ -137,10 +139,17 @@ const ChatWindow = ({ chat }) => {
 
   if (!chat) {
     return (
-      <div className="chat-window-empty">
-        <div className="empty-state">
-          <h3>Select a chat to start messaging</h3>
-          <p>Choose a conversation from the list or start a new one</p>
+      <div className="flex-1 flex items-center justify-center bg-gray-50">
+        <div className="text-center p-8">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <User className="text-gray-400" size={48} />
+          </div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-3">
+            Select a chat to start messaging
+          </h3>
+          <p className="text-gray-600">
+            Choose a conversation from the list or start a new one
+          </p>
         </div>
       </div>
     );
@@ -152,88 +161,131 @@ const ChatWindow = ({ chat }) => {
   const chatMessages = messages[chat._id] || [];
   const messageGroups = groupMessagesByDate(chatMessages);
   const currentTypingUsers = typingUsers[chat._id] || [];
+  const isOnline = chat.onlineUsers?.includes(user._id);
 
   return (
-    <div className="chat-window">
+    <div className="flex flex-col h-full bg-white">
       {/* Chat Header */}
-      <div className="chat-header">
-        <div className="chat-participant-info">
-          <div className="participant-avatar">
-            {user.avatar ? (
-              <img src={user.avatar} alt={user.firstName} />
-            ) : (
-              <div className="avatar-placeholder">
-                {user.firstName?.charAt(0) || 'U'}{user.lastName?.charAt(0) || ''}
-              </div>
-            )}
-            <div className={`user-status ${chat.onlineUsers?.includes(user._id) ? 'online' : 'offline'}`}></div>
-          </div>
-          <div className="participant-details">
-            <h3>
-              {business.name || `${user.firstName || 'Unknown'} ${user.lastName || 'User'}`}
-            </h3>
-            <p className="participant-status">
-              {chat.onlineUsers?.includes(user._id) ? 'Online' : 'Offline'}
-            </p>
-          </div>
+      <div className="flex items-center gap-4 p-6 border-b border-gray-200 bg-white/70 backdrop-blur-sm">
+        <div className="relative">
+          {user.avatar ? (
+            <img 
+              src={user.avatar} 
+              alt={user.firstName}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+          ) : (
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold">
+              {business.name ? (
+                <Building2 size={20} />
+              ) : (
+                <span className="text-sm">
+                  {user.firstName?.charAt(0) || 'U'}{user.lastName?.charAt(0) || ''}
+                </span>
+              )}
+            </div>
+          )}
+          <div className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white ${
+            isOnline ? 'bg-green-500' : 'bg-gray-300'
+          }`}></div>
+        </div>
+        
+        <div className="flex-1">
+          <h3 className="font-bold text-gray-900 text-lg">
+            {business.name || `${user.firstName || 'Unknown'} ${user.lastName || 'User'}`}
+          </h3>
+          <p className={`text-sm ${isOnline ? 'text-green-600' : 'text-gray-500'}`}>
+            {isOnline ? 'Online' : 'Offline'}
+          </p>
         </div>
       </div>
 
       {/* Messages Area */}
-      <div className="messages-container">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         {loading ? (
-          <div className="messages-loading">Loading messages...</div>
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">
+              <LoadingSpinner />
+              <p className="text-gray-600 mt-4">Loading messages...</p>
+            </div>
+          </div>
         ) : (
           <>
             {messageGroups.map(group => (
-              <div key={group.date} className="message-group">
-                <div className="date-separator">
-                  <span>{group.dateLabel}</span>
+              <div key={group.date} className="space-y-4">
+                {/* Date Separator */}
+                <div className="flex items-center justify-center my-6">
+                  <div className="bg-white px-4 py-2 rounded-full shadow-sm border border-gray-200">
+                    <span className="text-sm text-gray-600 font-medium">{group.dateLabel}</span>
+                  </div>
                 </div>
                 
-                {group.messages.map(message => (
-                  <div
-                    key={message._id}
-                    className={`message ${message.sender === chat.currentUserId ? 'sent' : 'received'}`}
-                  >
-                    <div className="message-content">
-                      {message.messageType === 'text' ? (
-                        <p>{message.content}</p>
-                      ) : (
-                        <div className="message-attachment">
-                          📎 {message.messageType}: {message.content}
+                {/* Messages */}
+                {group.messages.map(message => {
+                  const isSent = message.sender === chat.currentUserId;
+                  const isRead = message.readBy?.length > 1;
+                  
+                  return (
+                    <div
+                      key={message._id}
+                      className={`flex ${isSent ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div className={`max-w-xs lg:max-w-md ${isSent ? 'order-2' : 'order-1'}`}>
+                        <div className={`rounded-2xl px-4 py-3 ${
+                          isSent 
+                            ? 'bg-blue-600 text-white' 
+                            : 'bg-white border border-gray-200 text-gray-900'
+                        }`}>
+                          {message.messageType === 'text' ? (
+                            <p className="text-sm leading-relaxed">{message.content}</p>
+                          ) : (
+                            <div className="flex items-center gap-2 text-sm">
+                              <Paperclip size={16} />
+                              <span>{message.messageType}: {message.content}</span>
+                            </div>
+                          )}
                         </div>
-                      )}
+                        
+                        {/* Message Meta */}
+                        <div className={`flex items-center gap-2 mt-1 text-xs text-gray-500 ${
+                          isSent ? 'justify-end' : 'justify-start'
+                        }`}>
+                          <span>{formatMessageTime(message.createdAt)}</span>
+                          {isSent && (
+                            <div className="flex items-center">
+                              {isRead ? (
+                                <CheckCheck size={14} className="text-blue-500" />
+                              ) : (
+                                <Check size={14} className="text-gray-400" />
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <div className="message-meta">
-                      <span className="message-time">
-                        {formatMessageTime(message.createdAt)}
-                      </span>
-                      {message.sender === chat.currentUserId && (
-                        <span className={`message-status ${message.readBy?.length > 1 ? 'read' : 'sent'}`}>
-                          {message.readBy?.length > 1 ? '✓✓' : '✓'}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ))}
             
             {/* Typing Indicator */}
             {currentTypingUsers.length > 0 && (
-              <div className="typing-indicator">
-                <div className="typing-dots">
-                  <span></span>
-                  <span></span>
-                  <span></span>
+              <div className="flex justify-start">
+                <div className="bg-white rounded-2xl px-4 py-3 border border-gray-200 max-w-xs">
+                  <div className="flex items-center gap-2">
+                    <div className="flex space-x-1">
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                      <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                    </div>
+                    <span className="text-sm text-gray-600">
+                      {currentTypingUsers.length === 1 
+                        ? `${currentTypingUsers[0].firstName} is typing...`
+                        : `${currentTypingUsers.length} people are typing...`
+                      }
+                    </span>
+                  </div>
                 </div>
-                <span className="typing-text">
-                  {currentTypingUsers.length === 1 
-                    ? `${currentTypingUsers[0].firstName} is typing...`
-                    : `${currentTypingUsers.length} people are typing...`
-                  }
-                </span>
               </div>
             )}
             
@@ -243,24 +295,25 @@ const ChatWindow = ({ chat }) => {
       </div>
 
       {/* Message Input */}
-      <form className="message-input-form" onSubmit={handleSendMessage}>
-        <div className="message-input-container">
+      <form 
+        className="p-4 border-t border-gray-200 bg-white" 
+        onSubmit={handleSendMessage}
+      >
+        <div className="flex items-center gap-3">
           <input
             type="text"
             value={messageInput}
             onChange={handleInputChange}
             placeholder="Type a message..."
-            className="message-input"
             disabled={loading}
+            className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 disabled:opacity-50"
           />
           <button
             type="submit"
-            className="send-button"
             disabled={!messageInput.trim() || loading}
+            className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
-            </svg>
+            <Send size={20} />
           </button>
         </div>
       </form>
