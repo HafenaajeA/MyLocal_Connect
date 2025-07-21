@@ -330,4 +330,63 @@ router.post('/:id/comment', authMiddleware, [
   }
 });
 
+// @route   DELETE /api/posts/:id/comment/:commentId
+// @desc    Delete a comment from a post
+// @access  Private
+router.delete('/:id/comment/:commentId', authMiddleware, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+
+    if (!post || !post.isActive) {
+      return res.status(404).json({
+        success: false,
+        message: 'Post not found'
+      });
+    }
+
+    const comment = post.comments.id(req.params.commentId);
+    
+    if (!comment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Comment not found'
+      });
+    }
+
+    // Check if user owns the comment or is admin
+    const commentUserId = comment.user.toString();
+    const requestUserId = req.user.id.toString();
+    
+    console.log('Delete comment auth check:');
+    console.log('Comment user ID:', commentUserId);
+    console.log('Request user ID:', requestUserId);
+    console.log('Match:', commentUserId === requestUserId);
+    console.log('Request user role:', req.user.role);
+    
+    if (commentUserId !== requestUserId && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Insufficient permissions.'
+      });
+    }
+
+    comment.deleteOne();
+    await post.save();
+    
+    await post.populate('comments.user', 'username firstName lastName avatar');
+
+    res.json({
+      success: true,
+      message: 'Comment deleted successfully',
+      comments: post.comments
+    });
+  } catch (error) {
+    console.error('Delete comment error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 export default router;

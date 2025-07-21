@@ -67,6 +67,8 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const user = authService.getStoredUser();
     
+    console.log('Auth initialization:', { token: !!token, user });
+    
     if (token && user) {
       dispatch({ type: 'SET_USER', payload: user });
     } else {

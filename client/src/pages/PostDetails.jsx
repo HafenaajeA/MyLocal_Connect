@@ -33,6 +33,7 @@ const PostDetails = () => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState('');
   const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+  const [deletingCommentId, setDeletingCommentId] = useState(null);
 
   useEffect(() => {
     fetchPost();
@@ -45,8 +46,18 @@ const PostDetails = () => {
       if (response.success) {
         setPost(response.post);
         setLikesCount(response.post.likes?.length || 0);
-        setIsLiked(response.post.likes?.some(like => like.user === user?._id) || false);
+        // Fix: Check both user._id and user.id, and handle both string and object comparison
+        const userId = user?._id || user?.id;
+        setIsLiked(response.post.likes?.some(like => {
+          const likeUserId = like.user?._id || like.user?.id || like.user;
+          return likeUserId === userId;
+        }) || false);
         setComments(response.post.comments || []);
+        
+        // Debug logging
+        console.log('User:', user);
+        console.log('Post likes:', response.post.likes);
+        console.log('Post comments:', response.post.comments);
       } else {
         setError('Post not found');
       }
@@ -104,6 +115,32 @@ const PostDetails = () => {
       toast.error('Failed to add comment');
     } finally {
       setIsSubmittingComment(false);
+    }
+  };
+
+  const handleDeleteComment = async (commentId) => {
+    if (!user) {
+      toast.error('Please login to delete comments');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this comment?')) {
+      return;
+    }
+
+    try {
+      setDeletingCommentId(commentId);
+      const response = await postService.deleteComment(id, commentId);
+      
+      if (response.success) {
+        setComments(response.comments);
+        toast.success('Comment deleted successfully!');
+      }
+    } catch (error) {
+      console.error('Delete comment error:', error);
+      toast.error('Failed to delete comment');
+    } finally {
+      setDeletingCommentId(null);
     }
   };
 
@@ -293,6 +330,10 @@ const PostDetails = () => {
             <h3 className="text-xl font-semibold text-gray-800 mb-6 flex items-center space-x-2">
               <MessageCircle className="w-6 h-6" />
               <span>Comments ({comments?.length || 0})</span>
+              {/* Debug info - remove after testing */}
+              <div className="ml-4 text-sm text-gray-500">
+                {user ? `Logged in as: ${user.firstName || user.username}` : 'Not logged in'}
+              </div>
             </h3>
 
             {/* Add Comment Form */}
@@ -364,16 +405,42 @@ const PostDetails = () => {
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-gray-900">
-                          {comment.user?.firstName ? 
-                            `${comment.user.firstName} ${comment.user.lastName}` : 
-                            comment.user?.username || 'Anonymous'
-                          }
-                        </span>
-                        <span className="text-sm text-gray-500">
-                          {formatRelativeDate(comment.createdAt)}
-                        </span>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center space-x-2">
+                          <span className="font-medium text-gray-900">
+                            {comment.user?.firstName ? 
+                              `${comment.user.firstName} ${comment.user.lastName}` : 
+                              comment.user?.username || 'Anonymous'
+                            }
+                          </span>
+                          <span className="text-sm text-gray-500">
+                            {formatRelativeDate(comment.createdAt)}
+                          </span>
+                        </div>
+                        {(() => {
+                          if (!user) return null;
+                          
+                          const userId = user._id || user.id;
+                          const commentUserId = comment.user?._id || comment.user?.id;
+                          console.log('User ID:', userId, 'Comment User ID:', commentUserId, 'Match:', userId === commentUserId);
+                          
+                          const canDelete = userId === commentUserId;
+                          
+                          return canDelete ? (
+                            <button
+                              onClick={() => handleDeleteComment(comment._id)}
+                              disabled={deletingCommentId === comment._id}
+                              className="p-1 text-gray-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                              title="Delete comment"
+                            >
+                              {deletingCommentId === comment._id ? (
+                                <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+                              ) : (
+                                <Trash2 className="w-4 h-4" />
+                              )}
+                            </button>
+                          ) : null;
+                        })()}
                       </div>
                       <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
                         {comment.text}

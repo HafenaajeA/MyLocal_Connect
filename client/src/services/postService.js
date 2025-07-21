@@ -53,5 +53,11 @@ export const postService = {
   addComment: async (id, text) => {
     const response = await api.post(`/posts/${id}/comment`, { text });
     return response.data;
+  },
+
+  // Delete comment from post
+  deleteComment: async (postId, commentId) => {
+    const response = await api.delete(`/posts/${postId}/comment/${commentId}`);
+    return response.data;
   }
 };
