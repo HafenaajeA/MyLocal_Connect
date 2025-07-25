@@ -49,5 +49,27 @@ temp/
 # MongoDB
 data/
 
+# Documentation and deployment files (keep local only)
+docs/
+*.env.production
+render-*.yaml
+deployment-guide.sh
+generate-secrets.sh
+*_GUIDE.md
+*_SUMMARY.md
+*_CHECKLIST.md
+*_CONFIGURATION.md
+*_TROUBLESHOOTING.md
+ADMIN_ACCESS_GUIDE.md
+BUSINESS_API*.md
+CHANGELOG.md
+CHAT_TESTING_GUIDE.md
+FINAL_CONFIGURATION.md
+PNPM_GUIDE.md
+REACT_*.md
+REVIEW_*.md
+SERVER_TROUBLESHOOTING.md
+TAILWIND_CONVERSION.md
+
 # Package manager
 .pnpm-store/
