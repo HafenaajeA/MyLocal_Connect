@@ -219,15 +219,131 @@ pnpm start
 
 ## Deployment
 
-### Backend Deployment (e.g., Heroku)
-1. Set environment variables
-2. Ensure MongoDB connection
-3. Deploy with `git push heroku main`
+### Prerequisites for Deployment
+- GitHub repository (for connecting to Render)
+- MongoDB Atlas account
+- Render account
 
-### Frontend Deployment (e.g., Netlify/Vercel)
-1. Build the project: `pnpm run build`
-2. Deploy the `dist` folder
-3. Set environment variables
+### 1. Database Setup (MongoDB Atlas)
+
+1. **Create MongoDB Atlas Account**
+   - Sign up at [MongoDB Atlas](https://www.mongodb.com/atlas)
+   - Create a new project and cluster (free tier available)
+
+2. **Configure Database Access**
+   - Create a database user with read/write permissions
+   - Note the username and password
+
+3. **Configure Network Access**
+   - Add IP address `0.0.0.0/0` (allow access from anywhere)
+
+4. **Get Connection String**
+   - Go to Clusters → Connect → Connect your application
+   - Copy the connection string
+   - Format: `mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/<database>?retryWrites=true&w=majority`
+
+### 2. Backend Deployment (Render)
+
+1. **Create Web Service on Render**
+   - Go to [Render](https://render.com) and sign up
+   - Click "New" → "Web Service"
+   - Connect your GitHub repository
+
+2. **Configure Backend Service**
+   ```
+   Name: mylocal-connect-backend
+   Environment: Node
+   Build Command: cd server && npm install
+   Start Command: cd server && npm start
+   Auto-Deploy: Yes
+   ```
+
+3. **Set Environment Variables**
+   ```
+   NODE_ENV=production
+   PORT=10000
+   MONGODB_URI=<your-mongodb-atlas-connection-string>
+   JWT_SECRET=<generate-a-strong-secret-key>
+   CLIENT_URL=<your-frontend-render-url>
+   SESSION_SECRET=<generate-a-strong-session-secret>
+   ```
+
+### 3. Frontend Deployment (Render)
+
+1. **Create Static Site on Render**
+   - Click "New" → "Static Site"
+   - Connect your GitHub repository
+
+2. **Configure Frontend Service**
+   ```
+   Name: mylocal-connect-frontend
+   Build Command: cd client && npm install && npm run build
+   Publish Directory: client/dist
+   Auto-Deploy: Yes
+   ```
+
+3. **Set Environment Variables**
+   ```
+   VITE_API_URL=<your-backend-render-url>/api
+   VITE_APP_NAME=MyLocal Connect
+   VITE_APP_VERSION=1.0.0
+   ```
+
+### 4. Post-Deployment Steps
+
+1. **Update URLs**
+   - Copy your backend service URL from Render
+   - Update `VITE_API_URL` in frontend environment variables
+   - Copy your frontend URL and update `CLIENT_URL` in backend environment variables
+
+2. **Test Deployment**
+   - Visit your frontend URL
+   - Test user registration and login
+   - Verify database connections
+
+3. **Optional: Custom Domain**
+   - Configure custom domain in Render dashboard
+   - Update environment variables with new domain
+
+### 5. Deployment Commands
+
+```bash
+# Run deployment guide
+./deployment-guide.sh
+
+# Build client for production (local testing)
+cd client && npm run build
+
+# Test production build locally
+cd client && npm run preview
+```
+
+### Environment Variables Reference
+
+#### Backend (.env.production)
+```env
+NODE_ENV=production
+PORT=10000
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/mylocal_connect?retryWrites=true&w=majority
+JWT_SECRET=your_super_secure_jwt_secret_key_for_production
+CLIENT_URL=https://your-app-name.onrender.com
+SESSION_SECRET=your_production_session_secret_key
+```
+
+#### Frontend (.env.production)
+```env
+VITE_API_URL=https://your-backend-app-name.onrender.com/api
+VITE_APP_NAME=MyLocal Connect
+VITE_APP_VERSION=1.0.0
+```
+
+### Troubleshooting Deployment
+
+- **Build fails**: Check that all dependencies are in package.json
+- **Database connection fails**: Verify MongoDB Atlas connection string and network access
+- **CORS errors**: Ensure CLIENT_URL matches your frontend domain exactly
+- **API calls fail**: Verify VITE_API_URL includes '/api' suffix
+- **Environment variables**: Check that all required variables are set in Render dashboard
 
 ## Contributing
 

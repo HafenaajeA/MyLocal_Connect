@@ -1,0 +1,14 @@
+# Render deployment configuration for frontend
+services:
+  - type: web
+    name: mylocal-connect-frontend
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/dist
+    envVars:
+      - key: VITE_API_URL
+        value: # Add your backend URL + /api
+      - key: VITE_APP_NAME
+        value: MyLocal Connect
+      - key: VITE_APP_VERSION
+        value: 1.0.0
