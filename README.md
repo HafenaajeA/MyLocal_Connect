@@ -29,6 +29,8 @@ A modern, full-stack community platform built with the MERN stack that connects 
 **Base URL**: https://mylocal-connect-backend.onrender.com
 **API Endpoints**: https://mylocal-connect-backend.onrender.com/api
 
+> **📝 Note**: The backend runs on Render's free tier, which may sleep after 15 minutes of inactivity. First request after sleep may take 30-60 seconds to wake up. Subsequent requests are fast.
+
 ### 🔍 **Quick Start Guide**
 1. **Visit**: https://mylocal-connect-frontend.onrender.com
 2. **Register**: Create your account
