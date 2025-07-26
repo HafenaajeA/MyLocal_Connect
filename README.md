@@ -17,6 +17,8 @@ A modern, full-stack community platform built with the MERN stack that connects 
 ![MyLocal Connect Homepage](media/screenshots/home.png)
 *Main homepage showing community posts, navigation, and responsive design*
 
+**🎥 [Demo Video Available](media/videos/video.mp4)** - Watch a complete walkthrough of the application features
+
 > **🎯 [Try the Live Application →](https://mylocal-connect-frontend.onrender.com)**
 
 ## 🎯 Live Application
