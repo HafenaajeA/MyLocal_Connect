@@ -71,16 +71,19 @@ REVIEW_*.md
 SERVER_TROUBLESHOOTING.md
 TAILWIND_CONVERSION.md
 
-# Media files - Allow screenshots but ignore large video files
+# Media files - Allow screenshots and demo videos, exclude very large files
 # Note: Documentation files are now organized in /docs folder
-media/videos/*.mp4
-media/videos/*.avi
-media/videos/*.mov
-media/demos/*.mp4
-media/demos/*.avi
-media/demos/*.mov
-# Allow screenshots and small images for documentation
+
+# Allow demo videos under 50MB for documentation
+# media/videos/ - ALLOWED for project showcase
+# media/demos/ - ALLOWED for project showcase  
 # media/screenshots/ - ALLOWED for README display
+
+# Exclude very large video files (over 50MB)
+*.mov
+*.avi
+*_large.mp4
+*_full.mp4
 *.webp
 
 # Package manager
