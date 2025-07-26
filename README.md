@@ -90,9 +90,29 @@ MyLocal_Connect/
 │   ├── routes/                # Express routes
 │   ├── package.json
 │   └── server.js              # Entry point
+├── docs/                       # 📚 Comprehensive documentation
+│   ├── api/                   # API documentation & examples
+│   ├── deployment/            # Deployment guides & configs
+│   ├── guides/                # User & developer guides
+│   ├── media/                 # Media creation documentation
+│   └── README.md              # Documentation index
+├── media/                      # 🎬 Screenshots, videos, demos
+│   ├── screenshots/           # Application screenshots
+│   ├── videos/               # Demo videos
+│   └── demos/                # Interactive demos
 ├── package.json               # Root package.json
-└── README.md
+└── README.md                  # Main project documentation
 ```
+
+## 📚 **Documentation**
+
+Comprehensive documentation is available in the [`docs/`](./docs/) folder:
+
+- **[📖 Documentation Index](./docs/README.md)** - Complete documentation overview
+- **[🔌 API Reference](./docs/api/)** - Detailed API documentation and examples
+- **[🚀 Deployment Guides](./docs/deployment/)** - Step-by-step deployment instructions
+- **[📋 User Guides](./docs/guides/)** - Guides for users and developers
+- **[🎬 Media Creation](./docs/media/)** - How to create screenshots and videos
 
 ## 🚀 **Deployment Information**
 

@@ -71,5 +71,19 @@ REVIEW_*.md
 SERVER_TROUBLESHOOTING.md
 TAILWIND_CONVERSION.md
 
+# Media files (screenshots, videos, demos)
+# Note: Documentation files are now organized in /docs folder
+media/screenshots/
+media/videos/
+media/demos/
+*.mp4
+*.avi
+*.mov
+*.gif
+*.png
+*.jpg
+*.jpeg
+*.webp
+
 # Package manager
 .pnpm-store/
