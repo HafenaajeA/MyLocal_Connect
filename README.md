@@ -12,6 +12,13 @@
 
 A modern, full-stack community platform built with the MERN stack that connects local communities, enables business discovery, and facilitates social interactions. Perfect for neighborhoods, local communities, and small businesses to stay connected.
 
+## 📸 **Application Preview**
+
+![MyLocal Connect Homepage](media/screenshots/home.png)
+*Main homepage showing community posts, navigation, and responsive design*
+
+> **🎯 [Try the Live Application →](https://mylocal-connect-frontend.onrender.com)**
+
 ## 🎯 Live Application
 
 ### 🌐 **Main Application**
@@ -24,6 +31,7 @@ A modern, full-stack community platform built with the MERN stack that connects 
 - 💬 Real-time Chat System
 - 👥 User Profiles & Social Features
 - 📱 Responsive Mobile Design
+- 🔧 **Admin Dashboard** - Complete management panel
 
 ### 🔧 **API Backend**
 **Base URL**: https://mylocal-connect-backend.onrender.com
@@ -45,6 +53,8 @@ A modern, full-stack community platform built with the MERN stack that connects 
 - **User Management**: User registration, login, profile management
 - **Post Management**: Create, read, update, delete posts with categories
 - **Social Features**: Like posts, comment system, user following
+- **Business Directory**: Local business listings and management
+- **Admin Dashboard**: Complete admin panel for user & content moderation
 - **API Security**: Rate limiting, CORS, input validation, helmet security
 - **Database**: MongoDB with Mongoose ODM
 
@@ -258,6 +268,7 @@ The application is fully deployed and ready to use. Simply visit the link below:
 | 💬 **Chat** | Real-time messaging | Navigation → "Chat" |
 | 👤 **Profile** | Personal profile management | Navigation → "Profile" |
 | 🔍 **Search** | Find posts, businesses, users | Search bar in navigation |
+| 🔧 **Admin Panel** | User & content management (admin only) | Admin Dashboard |
 
 ### 📞 **User Support**
 
@@ -271,6 +282,61 @@ The application is fully deployed and ready to use. Simply visit the link below:
 - **🔒 Secure**: Your data is protected with industry-standard security
 - **⚡ Fast**: Optimized for quick loading and smooth experience
 - **🆓 Free**: Completely free to use for all community members
+
+## 🖼️ **Screenshots Gallery**
+
+<details>
+<summary><b>🎯 Click to View All App Screenshots</b></summary>
+
+### 🏠 **Homepage & Navigation**
+![Homepage](media/screenshots/home.png)
+
+### 📱 **User Interface Views**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-28-26.png" width="45%" alt="App View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-28-51.png" width="45%" alt="App View 2">
+
+### 🔐 **Authentication & User Management**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-29-00.png" width="45%" alt="Auth View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-29-13.png" width="45%" alt="Auth View 2">
+
+### 📝 **Posts & Community Features**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-29-24.png" width="45%" alt="Posts View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-30-17.png" width="45%" alt="Posts View 2">
+
+### 🏪 **Business Directory**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-31-04.png" width="45%" alt="Business View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-31-16.png" width="45%" alt="Business View 2">
+
+### 💬 **Chat & Social Features**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-32-06.png" width="45%" alt="Chat View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-32-49.png" width="45%" alt="Chat View 2">
+
+### 👤 **Profile & Settings**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-33-12.png" width="45%" alt="Profile View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-33-35.png" width="45%" alt="Profile View 2">
+
+### 🔍 **Search & Discovery**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-34-02.png" width="45%" alt="Search View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-34-11.png" width="45%" alt="Search View 2">
+
+### 📊 **Admin Dashboard & Management**
+*Comprehensive admin panel for managing users, posts, and businesses*
+
+<img src="media/screenshots/Screenshot from 2025-07-26 01-36-37.png" width="45%" alt="Admin Dashboard Overview">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-37-43.png" width="45%" alt="Admin Management Panel">
+
+**Admin Features:**
+- 👥 User management and moderation
+- 📝 Content management and oversight  
+- 🏪 Business listing approval
+- 📊 Analytics and reporting
+- 🔧 System configuration
+
+### ⚙️ **Additional Features**
+<img src="media/screenshots/Screenshot from 2025-07-26 01-35-05.png" width="45%" alt="Feature View 1">
+<img src="media/screenshots/Screenshot from 2025-07-26 01-35-21.png" width="45%" alt="Feature View 2">
+
+</details>
 
 ---
 
